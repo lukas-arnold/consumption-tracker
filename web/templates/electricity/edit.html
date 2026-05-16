@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang='{{T "language"}}'>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{T "editElectricity"}}</title>
+  <link rel="icon" type="image/x-icon" href="/web/assets/favicon.ico">
+  <link rel="manifest" href="/web/manifest.json">
+  <link rel="stylesheet" href="/web/css/pico.min.css">
+  <link rel="stylesheet" href="/web/css/center.css">
+  <link rel="stylesheet" href="/web/assets/fontawesome/css/fontawesome.min.css">
+  <link rel="stylesheet" href="/web/assets/fontawesome/css/solid.min.css">
+  <script src="/web/js/format.js" defer></script>
+</head>
+
+<body>
+
+  <header class="container">
+    <nav>
+      <ul>
+        <li><strong>Consumption Tracker</strong></li>
+      </ul>
+      <ul>
+        <li><a href="/electricity">{{T "electricity"}}</a></li>
+        <li><a href="/oil">{{T "oil"}}</a></li>
+        <li><a href="/water">{{T "water"}}</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1 class="center">{{T "editElectricity"}}</h1>
+    <form action="/electricity/save/{{.Id}}" method="POST">
+      <input type="date" name="timeFrom" value="{{.TimeFrom}}" required>
+      <input type="date" name="timeTo" value="{{.TimeTo}}" required>
+      <input type="number" step="1" name="usage" value="{{.Usage}}" placeholder='{{T "usage"}}' required>
+      <input type="number" step="0.01" name="costs" value="{{.Costs}}" placeholder='{{T "costs"}}' required>
+      <input type="text" name="retailer" value="{{.Retailer}}" placeholder='{{T "retailer"}}' required>
+      <input type="number" step="0.01" name="payments" value="{{.Payments}}" placeholder='{{T "payments"}}' required>
+      <textarea name="note" placeholder='{{T "note"}}'>{{.Note}}</textarea>
+      <input type="submit" value='{{T "save"}}'>
+    </form>
+  </main>
+
+</body>
+
+</html>

@@ -1,0 +1,188 @@
+{{define "electricity"}}
+<h2 class="center">{{T "electricity"}}</h2>
+  <style>
+    .chart-full { width:100%; margin:0 auto 30px auto; }
+    .chart-canvas { display:block; width:100%; height:360px; max-height:600px; }
+    .chart-canvas--price { height:300px; }
+    td { word-break: break-word; }
+    td:nth-last-child(2) { white-space: normal; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
+  </style>
+
+  <div class="chart-full">
+    <h3 class="center">{{T "usageCostsPerYear"}}</h3>
+    <canvas id="yearChart" class="chart-canvas"></canvas>
+  </div>
+  <div class="chart-full">
+    <h3 class="center">{{T "pricePerUnit"}}</h3>
+    <canvas id="priceChart" class="chart-canvas chart-canvas--price"></canvas>
+  </div>
+<div class="grid" style="gap:1rem; margin:1rem 0;">
+  <article class="card">
+    <strong>{{T "totalUsage"}}</strong>
+    <div>{{Int .Summary.TotalUsage}} kWh</div>
+  </article>
+  <article class="card">
+    <strong>{{T "totalCosts"}}</strong>
+    <div>{{Euro .Summary.TotalCosts}}</div>
+  </article>
+  <article class="card">
+    <strong>{{T "averageUsagePerYear"}}</strong>
+    <div>{{Int .Summary.AverageUsagePerYear}} kWh</div>
+  </article>
+  <article class="card">
+    <strong>{{T "averageCostPerUnit"}}</strong>
+    <div>{{Euro .Summary.AverageCostPerUnit}} /kWh</div>
+  </article>
+</div>
+<div class="table-cards" style="overflow-x: auto;">
+  <table style="min-width:1200px; width:100%; white-space:nowrap;">
+    <thead>
+      <tr>
+        <th>{{T "period"}}</th>
+        <th>{{T "usage"}}</th>
+        <th>{{T "pricePerUnit"}}</th>
+        <th>{{T "costs"}}</th>
+        <th>{{T "retailer"}}</th>
+        <th>{{T "payments"}}</th>
+        <th>{{T "monthlyPayment"}}</th>
+        <th>{{T "difference"}}</th>
+        <th>{{T "note"}}</th>
+        <th>{{T "action"}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Electricity}}
+      <tr>
+        <td>
+          <div class="date">{{.TimeFrom}}</div>
+          <div class="date">{{.TimeTo}}</div>
+        </td>
+        <td>{{Int .Usage}} kWh</td>
+        <td>{{Price .Costs .Usage "kWh"}}</td>
+        <td>{{Euro .Costs}}</td>
+        <td>{{.Retailer}}</td>
+        <td>{{Euro .Payments}}</td>
+        <td>{{Monthly .Payments}}</td>
+        <td>{{Difference .Payments .Costs}}</td>
+        <td style="white-space: normal; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word;">{{.Note}}</td>
+        <td>
+          <article>
+            <form action="/electricity/edit/{{.Id}}">
+              <button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
+            </form>
+            <form action="/electricity/delete/{{.Id}}">
+              <button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </article>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<div class="center">
+  <form action="/electricity/add" style="width:100%; max-width:400px;">
+    <button type="submit" class="primary" style="width:100%;">{{T "addElectricity"}}</button>
+  </form>
+</div>
+
+<script>
+  function formatInteger(value) {
+    const num = parseFloat(value);
+    return isNaN(num) ? value : num.toLocaleString('de-DE', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+  }
+
+  function formatCurrency(value) {
+    const num = parseFloat(value);
+    return isNaN(num) ? value : num.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+  }
+
+  const yearCtx = document.getElementById('yearChart');
+  new Chart(yearCtx, {
+    type: 'line',
+    data: {
+      labels: [{{range $i,$label:=.Chart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
+      datasets: [{
+        label: '{{T "usage"}}',
+        data: [{{range $i,$v:=.Chart.Usages}}{{if $i}},{{end}}{{$v}}{{end}}],
+        borderWidth: 2,
+        backgroundColor: 'rgba(54,162,235,0.2)',
+        borderColor: 'rgb(54,162,235)',
+      }, {
+        label: '{{T "costs"}}',
+        data: [{{range $i,$v:=.Chart.Costs}}{{if $i}},{{end}}{{$v}}{{end}}],
+        borderWidth: 2,
+        backgroundColor: 'rgba(255,99,132,0.2)',
+        borderColor: 'rgb(255,99,132)',
+        yAxisID: 'y1'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {mode:'index', intersect:false},
+      plugins: {
+        tooltip: {
+          callbacks: {
+            title: (tooltipItem) => tooltipItem[0].label,
+            label: (tooltipItem) => tooltipItem.dataset.label + ': ' + (tooltipItem.dataset.yAxisID === 'y1' ? tooltipItem.raw.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €' : tooltipItem.raw.toLocaleString('de-DE', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' kWh')
+          }
+        }
+      },
+      scales: {
+        y: {
+          type: 'linear',
+          position: 'left',
+          beginAtZero: true,
+          ticks: { callback: function(value) { return value + ' kWh'; } }
+        },
+        y1: {
+          type: 'linear',
+          position: 'right',
+          grid: {drawOnChartArea: false},
+          ticks: { callback: function(value) { return value.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €'; } }
+        }
+      }
+    }
+  });
+
+  const priceCtx = document.getElementById('priceChart');
+  new Chart(priceCtx, {
+    type: 'line',
+    data: {
+      labels: [{{range $i,$label:=.Chart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
+      datasets: [{
+        label: '{{T "pricePerUnit"}}',
+        data: [{{range $i,$v:=.Chart.Prices}}{{if $i}},{{end}}{{printf "%.3f" $v}}{{end}}],
+        borderWidth: 2,
+        backgroundColor: 'rgba(75,192,192,0.2)',
+        borderColor: 'rgb(75,192,192)',
+        fill: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top' },
+        tooltip: {
+          callbacks: {
+            title: (tooltipItem) => tooltipItem[0].label,
+            label: (tooltipItem) => tooltipItem.dataset.label + ': ' + tooltipItem.formattedValue.replace('.', ',') + ' €/kWh'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value.toLocaleString('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' €';
+            }
+          }
+        }
+      }
+    }
+  });
+</script>
+{{end}}

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang='{{T "language"}}'>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{T "addWater"}}</title>
+  <link rel="stylesheet" href="/web/css/pico.min.css">
+</head>
+
+<body>
+  <header class="container">
+    <nav>
+      <ul>
+        <li><strong>Consumption Tracker</strong></li>
+      </ul>
+      <ul>
+        <li><a href="/electricity">{{T "electricity"}}</a></li>
+        <li><a href="/oil">{{T "oil"}}</a></li>
+        <li><a href="/water">{{T "water"}}</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container">
+    <h1>{{T "addWater"}}</h1>
+    <form action="/water/add" method="POST">
+      <input type="number" name="year" placeholder='{{T "year"}}' required>
+      <input type="number" step="1" name="volumeWater" placeholder='{{T "volumeWater"}}' required>
+      <input type="number" step="1" name="volumeWastewater" placeholder='{{T "volumeWastewater"}}' required>
+      <input type="number" step="1" name="volumeRainwater" placeholder='{{T "volumeRainwater"}}' required>
+      <input type="number" step="0.01" name="costsWater" placeholder='{{T "costsWater"}}' required>
+      <input type="number" step="0.01" name="costsWastewater" placeholder='{{T "costsWastewater"}}' required>
+      <input type="number" step="0.01" name="costsRainwater" placeholder='{{T "costsRainwater"}}' required>
+      <input type="number" step="0.01" name="payments" placeholder='{{T "payments"}}' required>
+      <input type="number" step="0.01" name="fixedPrice" placeholder='{{T "fixedPrice"}}' required>
+      <textarea name="note" placeholder='{{T "note"}}'></textarea>
+      <input type="submit" value='{{T "save"}}' style="width:100%;">
+    </form>
+  </main>
+
+</body>
+
+</html>

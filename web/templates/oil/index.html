@@ -1,0 +1,252 @@
+{{define "oil"}}
+<h2 class="center">{{T "oil"}}</h2>
+  <style>
+    .chart-full { width:100%; margin:0 auto 30px auto; }
+    .chart-canvas { display:block; width:100%; height:360px; max-height:700px; }
+    .chart-canvas--price { height:300px; }
+    .chart-canvas--fill { height:420px; }
+    td { word-break: break-word; }
+    td:nth-last-child(2) { white-space: normal; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
+  </style>
+
+  <div class="chart-full">
+    <h3 class="center">{{T "oilFillLevel"}}</h3>
+    <canvas id="fillChart" class="chart-canvas chart-canvas--fill"></canvas>
+  </div>
+  <div class="chart-full">
+    <h3 class="center">{{T "usageCostsPerYear"}}</h3>
+    <canvas id="yearChart" class="chart-canvas"></canvas>
+  </div>
+  <div class="chart-full">
+    <h3 class="center">{{T "pricePerUnit"}}</h3>
+    <canvas id="priceChart" class="chart-canvas chart-canvas--price"></canvas>
+  </div>
+<div class="grid" style="gap:1rem; margin:1rem 0;">
+  <article class="card">
+    <strong>{{T "totalUsage"}}</strong>
+    <div>{{Int .Summary.TotalUsage}} l</div>
+  </article>
+  <article class="card">
+    <strong>{{T "totalCosts"}}</strong>
+    <div>{{Euro .Summary.TotalCosts}}</div>
+  </article>
+  <article class="card">
+    <strong>{{T "averageUsagePerYear"}}</strong>
+    <div>{{Int .Summary.AverageUsagePerYear}} l</div>
+  </article>
+  <article class="card">
+    <strong>{{T "averageCostPerUnit"}}</strong>
+    <div>{{Euro .Summary.AverageCostPerUnit}} /l</div>
+  </article>
+</div>
+<div class="table-cards" style="overflow-x: auto;">
+  <table style="min-width:1200px; width:100%; white-space:nowrap;">
+    <thead>
+      <tr>
+        <th>{{T "date"}}</th>
+        <th>{{T "volume"}}</th>
+        <th>{{T "pricePerUnit"}}</th>
+        <th>{{T "costs"}}</th>
+        <th>{{T "retailer"}}</th>
+        <th>{{T "note"}}</th>
+        <th>{{T "action"}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Oil}}
+      <tr>
+        <td class="date">{{.Date}}</td>
+        <td>{{Int .Volume}} l</td>
+        <td>{{Price .Costs .Volume "l"}}</td>
+        <td>{{Euro .Costs}}</td>
+        <td>{{.Retailer}}</td>
+        <td>{{.Note}}</td>
+        <td>
+          <article>
+            <form action="/oil/edit/{{.Id}}">
+              <button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
+            </form>
+            <form action="/oil/delete/{{.Id}}">
+              <button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </article>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<div class="center">
+  <form action="/oil/add" style="width:100%; max-width:400px;">
+    <button type="submit" class="primary" style="width:100%;">{{T "addOil"}}</button>
+  </form>
+</div>
+
+<h3 class="center">{{T "oilFillLevel"}}</h3>
+<div class="table-cards" style="overflow-x: auto;">
+  <table style="min-width:700px; width:100%; white-space:nowrap;">
+    <thead>
+      <tr>
+        <th>{{T "date"}}</th>
+        <th>{{T "levelCm"}}</th>
+        <th>{{T "level"}}</th>
+        <th>{{T "action"}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .OilFillLevels}}
+      <tr>
+        <td class="date">{{.Date}}</td>
+        <td>{{Float .Level 1}} cm</td>
+        <td>{{Float .Percentage 2}} %</td>
+        <td>
+          <article>
+            <form action="/oil-fill-level/edit/{{.Id}}">
+              <button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
+            </form>
+            <form action="/oil-fill-level/delete/{{.Id}}">
+              <button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
+            </form>
+          </article>
+        </td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+</div>
+<form action="/oil-fill-level/add">
+  <input type="submit" value='{{T "addOilFillLevel"}}'/>
+</form>
+<script>
+  function formatDate(date) {
+    date = new Date(date);
+    const options = {year: "numeric", month: "2-digit", day: "2-digit"};
+    return date.toLocaleDateString("default", options);
+  }
+
+  function formatInteger(value) {
+    const num = parseFloat(value);
+    return isNaN(num) ? value : num.toLocaleString('de-DE', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+  }
+
+  function formatCurrency(value) {
+    const num = parseFloat(value);
+    return isNaN(num) ? value : num.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+  }
+
+  const yearCtx = document.getElementById('yearChart');
+  new Chart(yearCtx, {
+    type: 'line',
+    data: {
+      labels: [{{range $i,$label:=.OilChart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
+      datasets: [{
+        label: '{{T "volume"}}',
+        data: [{{range $i,$v:=.OilChart.Volumes}}{{if $i}},{{end}}{{$v}}{{end}}],
+        borderWidth: 2,
+        backgroundColor: 'rgba(54,162,235,0.2)',
+        borderColor: 'rgb(54,162,235)',
+        tension: 0.3,
+        yAxisID: 'y'
+      }, {
+        label: '{{T "costs"}}',
+        data: [{{range $i,$v:=.OilChart.Costs}}{{if $i}},{{end}}{{$v}}{{end}}],
+        borderWidth: 2,
+        backgroundColor: 'rgba(255,159,64,0.2)',
+        borderColor: 'rgb(255,159,64)',
+        tension: 0.3,
+        yAxisID: 'y1'
+      }]
+    },
+    options: {
+      responsive:true,
+      maintainAspectRatio: false,
+      interaction: {mode:'index', intersect:false},
+      plugins: {
+        tooltip: {
+          callbacks: {
+            title: (tooltipItem) => tooltipItem[0].label,
+            label: (tooltipItem) => tooltipItem.dataset.label + ': ' + (tooltipItem.dataset.yAxisID === 'y' ? tooltipItem.raw.toLocaleString('de-DE', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' l' : tooltipItem.raw.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €')
+          }
+        }
+      },
+      scales: {
+        y: {
+          type:'linear',
+          position:'left',
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value + ' l';
+            }
+          }
+        },
+        y1: {
+          type:'linear',
+          position:'right',
+          grid: {drawOnChartArea: false},
+          ticks: {
+            callback: function(value) {
+              return value.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const priceCtx = document.getElementById('priceChart');
+  new Chart(priceCtx, {
+    type: 'line',
+    data: {
+      labels: [{{range $i,$label:=.OilChart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
+      datasets: [{
+        label: '{{T "pricePerUnit"}}',
+        data: [{{range $i,$v:=.OilChart.Prices}}{{if $i}},{{end}}{{printf "%.3f" $v}}{{end}}],
+        borderWidth: 2,
+        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+        borderColor: 'rgb(255, 206, 86)',
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive:true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            title: (tooltipItem) => tooltipItem[0].label,
+            label: (tooltipItem) => tooltipItem.dataset.label + ': ' + tooltipItem.formattedValue.replace('.', ',') + ' €/l'
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return value.toLocaleString('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' €';
+            }
+          }
+        }
+      }
+    }
+  });
+
+  const fillCtx = document.getElementById('fillChart');
+  new Chart(fillCtx, {
+    type:'line',
+    data:{ labels:[{{range $i,$d:=.FillLevelChart.Dates}}{{if $i}},{{end}}"{{$d}}"{{end}}], datasets:[{label:'{{T "levelCm"}}', data:[{{range $i,$v:=.FillLevelChart.Levels}}{{if $i}},{{end}}{{$v}}{{end}}], backgroundColor:'rgba(153,102,255,0.2)', borderColor:'rgb(153,102,255)', fill:true, borderWidth:2}] },
+    options:{
+      responsive:true,
+      maintainAspectRatio: false,
+      plugins:{
+        tooltip:{callbacks:{title:(tooltipItem)=>formatDate(tooltipItem[0].label), label:(tooltipItem)=>tooltipItem.dataset.label + ': ' + tooltipItem.formattedValue + ' cm'}}
+      },
+      scales:{
+        y:{beginAtZero:true, max:150, ticks:{callback:function(value){return value + ' cm';}}},
+        x:{ticks:{callback:function(value){return formatDate(this.getLabelForValue(value));}}}
+      }
+    }
+  });
+</script>
+{{end}}
