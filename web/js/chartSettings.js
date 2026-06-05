@@ -1,0 +1,1 @@
+Chart.defaults.elements.line.tension = 0.4;

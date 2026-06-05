@@ -142,18 +142,10 @@
       datasets: [{
         label: '{{T "volume"}}',
         data: [{{range $i,$v:=.OilChart.Volumes}}{{if $i}},{{end}}{{$v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(54,162,235,0.2)',
-        borderColor: 'rgb(54,162,235)',
-        tension: 0.3,
         yAxisID: 'y'
       }, {
         label: '{{T "costs"}}',
         data: [{{range $i,$v:=.OilChart.Costs}}{{if $i}},{{end}}{{$v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(255,159,64,0.2)',
-        borderColor: 'rgb(255,159,64)',
-        tension: 0.3,
         yAxisID: 'y1'
       }]
     },
@@ -201,11 +193,7 @@
       labels: [{{range $i,$label:=.OilChart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
       datasets: [{
         label: '{{T "pricePerUnit"}}',
-        data: [{{range $i,$v:=.OilChart.Prices}}{{if $i}},{{end}}{{printf "%.3f" $v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-        borderColor: 'rgb(255, 206, 86)',
-        tension: 0.3
+        data: [{{range $i,$v:=.OilChart.Prices}}{{if $i}},{{end}}{{printf "%.3f" $v}}{{end}}]
       }]
     },
     options: {
@@ -235,7 +223,7 @@
   const fillCtx = document.getElementById('fillChart');
   new Chart(fillCtx, {
     type:'line',
-    data:{ labels:[{{range $i,$d:=.FillLevelChart.Dates}}{{if $i}},{{end}}"{{$d}}"{{end}}], datasets:[{label:'{{T "levelCm"}}', data:[{{range $i,$v:=.FillLevelChart.Levels}}{{if $i}},{{end}}{{$v}}{{end}}], backgroundColor:'rgba(153,102,255,0.2)', borderColor:'rgb(153,102,255)', fill:true, borderWidth:2}] },
+    data:{ labels:[{{range $i,$d:=.FillLevelChart.Dates}}{{if $i}},{{end}}"{{$d}}"{{end}}], datasets:[{label:'{{T "levelCm"}}', data:[{{range $i,$v:=.FillLevelChart.Levels}}{{if $i}},{{end}}{{$v}}{{end}}], fill:true}]},
     options:{
       responsive:true,
       maintainAspectRatio: false,

@@ -117,37 +117,21 @@
         {
           label: '{{T "water"}}',
           data: [{{range $i, $v := .Chart.VolumesWater}}{{if $i}}, {{end}}{{$v}}{{end}}],
-          backgroundColor: 'rgba(75, 192, 192, 0.2)',
-          borderColor: 'rgb(75, 192, 192)',
-          borderWidth: 2,
-          fill: false,
           yAxisID: 'y'
         },
         {
           label: '{{T "wastewater"}}',
           data: [{{range $i, $v := .Chart.VolumesWastewater}}{{if $i}}, {{end}}{{$v}}{{end}}],
-          backgroundColor: 'rgba(255, 159, 64, 0.2)',
-          borderColor: 'rgb(255, 159, 64)',
-          borderWidth: 2,
-          fill: false,
           yAxisID: 'y'
         },
         {
           label: '{{T "costsWater"}}',
           data: [{{range $i, $v := .Chart.CostsWater}}{{if $i}}, {{end}}{{$v}}{{end}}],
-          borderWidth: 2,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgb(54, 162, 235)',
-          fill: false,
           yAxisID: 'y1'
         },
         {
           label: '{{T "costsWastewater"}}',
           data: [{{range $i, $v := .Chart.CostsWastewater}}{{if $i}}, {{end}}{{$v}}{{end}}],
-          borderWidth: 2,
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderColor: 'rgb(255, 99, 132)',
-          fill: false,
           yAxisID: 'y1'
         }
       ]
@@ -192,32 +176,16 @@
       labels: [{{range $i, $year := .Chart.Labels}}{{if $i}}, {{end}}"{{$year}}"{{end}}],
       datasets: [{
         label: '{{T "priceWater"}}',
-        data: [{{range $i, $v := .Chart.PricesWater}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-        borderColor: 'rgb(54, 162, 235)',
-        fill: false
+        data: [{{range $i, $v := .Chart.PricesWater}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}]
       }, {
         label: '{{T "priceWastewater"}}',
-        data: [{{range $i, $v := .Chart.PricesWastewater}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-        borderColor: 'rgb(255, 99, 132)',
-        fill: false
+        data: [{{range $i, $v := .Chart.PricesWastewater}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}]
       }, {
         label: '{{T "priceRainwater"}}',
-        data: [{{range $i, $v := .Chart.PricesRainwater}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(153, 102, 255, 0.2)',
-        borderColor: 'rgb(153, 102, 255)',
-        fill: false
+        data: [{{range $i, $v := .Chart.PricesRainwater}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}]
       }, {
         label: '{{T "fixedPrice"}}',
-        data: [{{range $i, $v := .Chart.FixedPrices}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(255, 206, 86, 0.2)',
-        borderColor: 'rgb(255, 206, 86)',
-        fill: false
+        data: [{{range $i, $v := .Chart.FixedPrices}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}]
       }]
     },
     options: {

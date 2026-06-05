@@ -104,16 +104,10 @@
       labels: [{{range $i,$label:=.Chart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
       datasets: [{
         label: '{{T "usage"}}',
-        data: [{{range $i,$v:=.Chart.Usages}}{{if $i}},{{end}}{{$v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(54,162,235,0.2)',
-        borderColor: 'rgb(54,162,235)',
+        data: [{{range $i,$v:=.Chart.Usages}}{{if $i}},{{end}}{{$v}}{{end}}]
       }, {
         label: '{{T "costs"}}',
         data: [{{range $i,$v:=.Chart.Costs}}{{if $i}},{{end}}{{$v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(255,99,132,0.2)',
-        borderColor: 'rgb(255,99,132)',
         yAxisID: 'y1'
       }]
     },
@@ -153,11 +147,7 @@
       labels: [{{range $i,$label:=.Chart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
       datasets: [{
         label: '{{T "pricePerUnit"}}',
-        data: [{{range $i,$v:=.Chart.Prices}}{{if $i}},{{end}}{{printf "%.3f" $v}}{{end}}],
-        borderWidth: 2,
-        backgroundColor: 'rgba(75,192,192,0.2)',
-        borderColor: 'rgb(75,192,192)',
-        fill: false
+        data: [{{range $i,$v:=.Chart.Prices}}{{if $i}},{{end}}{{printf "%.3f" $v}}{{end}}]
       }]
     },
     options: {
