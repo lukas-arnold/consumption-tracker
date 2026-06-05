@@ -88,6 +88,9 @@ func GetOilFillLevelForChart() (models.OilFillLevelForChart, error) {
 	if err != nil {
 		return models.OilFillLevelForChart{}, err
 	}
+	sort.Slice(fillLevels, func(i, j int) bool {
+		return fillLevels[i].Date < fillLevels[j].Date
+	})
 	var dates []string
 	var levels []float64
 	for _, value := range fillLevels {
@@ -104,14 +107,14 @@ func GetWaterForChart() (models.WaterForChart, error) {
 	}
 	// Aggregate per-year totals separately for water, wastewater and rainwater
 	yearTotals := map[int]struct {
-		volumeWater     float64
+		volumeWater      float64
 		volumeWastewater float64
-		volumeRainwater float64
-		costsWater      float64
-		costsWastewater float64
-		costsRainwater  float64
-		totalFixedPrice float64
-		fixedCount      int
+		volumeRainwater  float64
+		costsWater       float64
+		costsWastewater  float64
+		costsRainwater   float64
+		totalFixedPrice  float64
+		fixedCount       int
 	}{}
 	for _, v := range waters {
 		t := yearTotals[v.Year]
@@ -180,20 +183,20 @@ func GetWaterForChart() (models.WaterForChart, error) {
 	}
 
 	return models.WaterForChart{
-		Waters: waters,
-		Labels: labels,
-		Volumes: volumes,
-		VolumesWater: volumesWater,
+		Waters:            waters,
+		Labels:            labels,
+		Volumes:           volumes,
+		VolumesWater:      volumesWater,
 		VolumesWastewater: volumesWastewater,
-		VolumesRainwater: volumesRainwater,
-		Costs: costs,
-		CostsWater: costsWater,
-		CostsWastewater: costsWastewater,
-		CostsRainwater: costsRainwater,
-		Prices: prices,
-		PricesWater: pricesWater,
-		PricesWastewater: pricesWastewater,
-		PricesRainwater: pricesRainwater,
-		FixedPrices: fixedPrices,
+		VolumesRainwater:  volumesRainwater,
+		Costs:             costs,
+		CostsWater:        costsWater,
+		CostsWastewater:   costsWastewater,
+		CostsRainwater:    costsRainwater,
+		Prices:            prices,
+		PricesWater:       pricesWater,
+		PricesWastewater:  pricesWastewater,
+		PricesRainwater:   pricesRainwater,
+		FixedPrices:       fixedPrices,
 	}, nil
 }

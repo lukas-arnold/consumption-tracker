@@ -88,7 +88,7 @@ func DeleteElectricity(id int64) error {
 
 func sortElectricity(electricity []models.Electricity) []models.Electricity {
 	sort.Slice(electricity, func(i, j int) bool {
-		return electricity[i].TimeFrom < electricity[j].TimeFrom
+		return electricity[j].TimeFrom < electricity[i].TimeFrom
 	})
 	return electricity
 }

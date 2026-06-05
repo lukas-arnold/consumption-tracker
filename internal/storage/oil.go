@@ -176,14 +176,14 @@ func DeleteOilFillLevel(id int64) error {
 
 func sortOil(oil []models.Oil) []models.Oil {
 	sort.Slice(oil, func(i, j int) bool {
-		return oil[i].Date < oil[j].Date
+		return oil[j].Date < oil[i].Date
 	})
 	return oil
 }
 
 func sortOilFillLevels(oilFillLevels []models.OilFillLevel) []models.OilFillLevel {
 	sort.Slice(oilFillLevels, func(i, j int) bool {
-		return oilFillLevels[i].Date < oilFillLevels[j].Date
+		return oilFillLevels[j].Date < oilFillLevels[i].Date
 	})
 	return oilFillLevels
 }

@@ -91,7 +91,7 @@ func DeleteWater(id int64) error {
 
 func sortWater(water []models.Water) []models.Water {
 	sort.Slice(water, func(i, j int) bool {
-		return water[i].Year < water[j].Year
+		return water[j].Year < water[i].Year
 	})
 	return water
 }
