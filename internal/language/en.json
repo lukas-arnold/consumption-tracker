@@ -1,53 +1,67 @@
 {
     "language": "en",
-    "title": "Consumption Tracker",
+
     "electricity": "Electricity",
-    "oil": "Oil",
-    "oilFillLevel": "Oil Fill Level",
+    "oil": "Heating Oil",
+    "oilFillLevel": "Heating Oil Tank Level",
     "water": "Water",
+    "wastewater": "Wastewater",
+    "rainwater": "Rainwater",
+
     "action": "Action",
     "period": "Period",
     "date": "Date",
     "year": "Year",
-    "usage": "Usage",
+    "yearsCount": "Years",
+    "note": "Note",
+
+    "usage": "Consumption",
     "volume": "Volume",
     "volumeWater": "Water Volume",
     "volumeWastewater": "Wastewater Volume",
     "volumeRainwater": "Rainwater Volume",
+
     "costs": "Costs",
     "costsWater": "Water Costs",
     "costsWastewater": "Wastewater Costs",
     "costsRainwater": "Rainwater Costs",
-    "retailer": "Retailer",
+
+    "fixedPrice": "Base Fee",
+    "pricePerUnit": "Price per ",
+    "priceWater": "Water Price per Unit",
+    "priceWastewater": "Wastewater Price per Unit",
+    "priceRainwater": "Rainwater Price per Unit",
+
     "payments": "Payments",
-    "fixedPrice": "Fixed Price",
-    "pricePerUnit": "Price per Unit",
-    "usageCostsPerYear": "Usage and Costs per Year",
+    "monthlyPayment": "Monthly Payment",
+    "retailer": "Heating Oil Supplier",
+
     "level": "Level",
-    "note": "Note",
-    "chart": "Chart",
-    "back": "Back",
     "levelCm": "Level (cm)",
-    "addElectricity": "Add Electricity entry",
-    "editElectricity": "Edit Electricity entry",
-    "addOil": "Add Oil entry",
-    "editOil": "Edit Oil entry",
-    "addOilFillLevel": "Add Oil Fill Level entry",
-    "editOilFillLevel": "Edit Oil Fill Level entry",
-    "addWater": "Add Water entry",
-    "editWater": "Edit Water entry",
+
+    "addElectricity": "Add Electricity Entry",
+    "editElectricity": "Edit Electricity Entry",
+
+    "addOil": "Add Heating Oil Entry",
+    "editOil": "Edit Heating Oil Entry",
+
+    "addOilFillLevel": "Add Heating Oil Tank Level",
+    "editOilFillLevel": "Edit Heating Oil Tank Level",
+
+    "addWater": "Add Water Entry",
+    "editWater": "Edit Water Entry",
+
     "summary": "Summary",
-    "totalUsage": "Total Usage",
-    "totalCosts": "Total Costs",
-    "averageUsagePerYear": "Average per Year",
-    "averageCostPerUnit": "Average Cost per Unit",
-    "monthlyPayment": "Monthly payment",
-    "difference": "Difference",
-    
-    "priceWater": "Water price per unit",
-    "priceWastewater": "Wastewater price per unit",
-    "priceRainwater": "Rainwater price per unit",
     "history": "History",
-    "yearsCount": "Years",
-    "save": "Save"
+    "chart": "Chart",
+
+    "totalUsage": "Total Consumption",
+    "totalCosts": "Total Costs",
+    "averageUsagePerYear": "Average Annual Consumption",
+    "averageCostPerUnit": "Average Cost per Unit",
+    "usageCostsPerYear": "Consumption and Costs per Year",
+    "difference": "Difference",
+
+    "save": "Save",
+    "back": "Back"
 }

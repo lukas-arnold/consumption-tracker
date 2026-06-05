@@ -42,13 +42,13 @@
       <tr>
         <th>{{T "year"}}</th>
         <th>{{T "volumeWater"}}</th>
-        <th>{{T "pricePerUnit"}} ({{T "water"}})</th>
+        <th>{{T "priceWater"}}</th>
         <th>{{T "costsWater"}}</th>
         <th>{{T "volumeWastewater"}}</th>
-        <th>{{T "pricePerUnit"}} ({{T "wastewater"}})</th>
+        <th>{{T "priceWastewater"}}</th>
         <th>{{T "costsWastewater"}}</th>
         <th>{{T "volumeRainwater"}}</th>
-        <th>{{T "pricePerUnit"}} ({{T "rainwater"}})</th>
+        <th>{{T "priceRainwater"}}</th>
         <th>{{T "costsRainwater"}}</th>
         <th>{{T "totalCosts"}}</th>
         <th>{{T "payments"}}</th>
@@ -91,11 +91,9 @@
     </tbody>
   </table>
 </div>
-<div class="center">
-  <form action="/water/add" style="width:100%; max-width:400px;">
-    <button class="primary" type="submit" style="width:100%;">{{T "addWater"}}</button>
-  </form>
-</div>
+<form action="/water/add">
+  <button class="primary" type="submit">{{T "addWater"}}</button>
+</form>
 <script>
   function formatInteger(value) {
     const num = parseFloat(value);
@@ -115,12 +113,12 @@
       labels: [{{range $i, $year := .Chart.Labels}}{{if $i}}, {{end}}"{{$year}}"{{end}}],
       datasets: [
         {
-          label: '{{T "water"}}',
+          label: '{{T "volumeWater"}}',
           data: [{{range $i, $v := .Chart.VolumesWater}}{{if $i}}, {{end}}{{$v}}{{end}}],
           yAxisID: 'y'
         },
         {
-          label: '{{T "wastewater"}}',
+          label: '{{T "volumeWastewater"}}',
           data: [{{range $i, $v := .Chart.VolumesWastewater}}{{if $i}}, {{end}}{{$v}}{{end}}],
           yAxisID: 'y'
         },
