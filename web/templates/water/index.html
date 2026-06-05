@@ -162,7 +162,7 @@
           type: 'linear',
           position: 'right',
           grid: { drawOnChartArea: false },
-          ticks: { callback: function(value) { return value.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €'; } }
+          ticks: { callback: function(value) { return value.toLocaleString('de-DE') + ' €'; } }
         }
       }
     }
@@ -185,7 +185,8 @@
         data: [{{range $i, $v := .Chart.PricesRainwater}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}]
       }, {
         label: '{{T "fixedPrice"}}',
-        data: [{{range $i, $v := .Chart.FixedPrices}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}]
+        data: [{{range $i, $v := .Chart.FixedPrices}}{{if $i}}, {{end}}{{printf "%.3f" $v}}{{end}}],
+        hidden: true
       }]
     },
     options: {
@@ -205,7 +206,7 @@
           beginAtZero: true,
           ticks: {
             callback: function(value) {
-              return value.toLocaleString('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' €';
+              return value.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
             }
           }
         }

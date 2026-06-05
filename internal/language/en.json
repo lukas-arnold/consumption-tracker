@@ -27,7 +27,7 @@
     "costsRainwater": "Rainwater Costs",
 
     "fixedPrice": "Base Fee",
-    "pricePerUnit": "Price per ",
+    "pricePerUnit": "Price per unit",
     "priceWater": "Water Price per Unit",
     "priceWastewater": "Wastewater Price per Unit",
     "priceRainwater": "Rainwater Price per Unit",

@@ -132,7 +132,7 @@
           type: 'linear',
           position: 'right',
           grid: {drawOnChartArea: false},
-          ticks: { callback: function(value) { return value.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €'; } }
+          ticks: { callback: function(value) { return value.toLocaleString('de-DE') + ' €'; } }
         }
       }
     }
@@ -165,7 +165,7 @@
           beginAtZero: true,
           ticks: {
             callback: function(value) {
-              return value.toLocaleString('de-DE', {minimumFractionDigits: 3, maximumFractionDigits: 3}) + ' €';
+              return value.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
             }
           }
         }
