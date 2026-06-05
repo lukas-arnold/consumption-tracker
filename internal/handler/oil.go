@@ -140,11 +140,11 @@ func HandleDeleteOil(w http.ResponseWriter, r *http.Request) {
 
 func HandleAddOilFillLevelGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("add_fill_level.html").Funcs(template.FuncMap{
+		template.New("addFillLevel.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/oil/add_fill_level.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/oil/addFillLevel.html"),
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
@@ -174,11 +174,11 @@ func HandleAddOilFillLevelPost(w http.ResponseWriter, r *http.Request) {
 
 func HandleEditOilFillLevel(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("edit_fill_level.html").Funcs(template.FuncMap{
+		template.New("editFillLevel.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/oil/edit_fill_level.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/oil/editFillLevel.html"),
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
