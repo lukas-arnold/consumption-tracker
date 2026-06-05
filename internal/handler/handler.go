@@ -42,7 +42,7 @@ func formatMonthly(payments float64) string {
 	if payments == 0 {
 		return "-"
 	}
-	return formatEuro(payments/12)
+	return formatEuro(payments / 12)
 }
 
 func formatDifference(payments, costs float64) string {
@@ -53,8 +53,8 @@ func formatDifference(payments, costs float64) string {
 	return formatEuro(difference)
 }
 
-func formatTotalCosts(costsWater, costsWastewater, costsRainwater float64) string {
-	total := costsWater + costsWastewater + costsRainwater
+func formatTotalCosts(costsWater, costsWastewater, costsRainwater, FixedPrice float64) string {
+	total := costsWater + costsWastewater + costsRainwater + FixedPrice
 	if total == 0 {
 		return "-"
 	}
@@ -74,14 +74,14 @@ func getTemplateFuncs() template.FuncMap {
 		"T": func(key string) string {
 			return language.T(configs.GetLanguage(), key)
 		},
-		"Float": formatFloat,
-		"Int":   formatInt,
-		"Euro":  formatEuro,
-		"Price": formatPrice,
-		"Monthly": formatMonthly,
+		"Float":      formatFloat,
+		"Int":        formatInt,
+		"Euro":       formatEuro,
+		"Price":      formatPrice,
+		"Monthly":    formatMonthly,
 		"Difference": formatDifference,
 		"TotalCosts": formatTotalCosts,
-		"Add": add,
+		"Add":        add,
 	}
 }
 
@@ -255,7 +255,7 @@ func buildWaterSummary(usageStorage models.UsageStorage) ConsumptionSummary {
 	for _, entry := range usageStorage.Water {
 		years[fmt.Sprint(entry.Year)] = true
 		totalVolume += entry.VolumeWater + entry.VolumeWastewater + entry.VolumeRainwater
-		totalCosts += entry.CostsWater + entry.CostsWastewater + entry.CostsRainwater
+		totalCosts += entry.CostsWater + entry.CostsWastewater + entry.CostsRainwater + entry.FixedPrice
 	}
 	yearsCount := len(years)
 	averageVolume := 0.0

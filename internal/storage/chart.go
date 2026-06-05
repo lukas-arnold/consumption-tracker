@@ -182,16 +182,23 @@ func GetWaterForChart() (models.WaterForChart, error) {
 		fixedPrices = append(fixedPrices, fixedPrice)
 	}
 
+	// For the chart, compute combined wastewater volumes and costs (wastewater + rainwater), as they are typically not separated in the bill
+	var _volumesWastewater []float64
+	var _costsWastewater []float64
+	for i := range volumesWastewater {
+		_volumesWastewater = append(_volumesWastewater, volumesWastewater[i]+volumesRainwater[i])
+		_costsWastewater = append(_costsWastewater, costsWastewater[i]+costsRainwater[i])
+	}
 	return models.WaterForChart{
 		Waters:            waters,
 		Labels:            labels,
 		Volumes:           volumes,
 		VolumesWater:      volumesWater,
-		VolumesWastewater: volumesWastewater,
+		VolumesWastewater: _volumesWastewater,
 		VolumesRainwater:  volumesRainwater,
 		Costs:             costs,
 		CostsWater:        costsWater,
-		CostsWastewater:   costsWastewater,
+		CostsWastewater:   _costsWastewater,
 		CostsRainwater:    costsRainwater,
 		Prices:            prices,
 		PricesWater:       pricesWater,

@@ -50,6 +50,7 @@
         <th>{{T "volumeRainwater"}}</th>
         <th>{{T "priceRainwater"}}</th>
         <th>{{T "costsRainwater"}}</th>
+        <th>{{T "fixedPrice"}}</th>
         <th>{{T "totalCosts"}}</th>
         <th>{{T "payments"}}</th>
         <th>{{T "monthlyPayment"}}</th>
@@ -71,7 +72,8 @@
         <td>{{Int .VolumeRainwater}} m³</td>
         <td>{{Price .CostsRainwater .VolumeRainwater "m³"}}</td>
         <td>{{Euro .CostsRainwater}}</td>
-        <td>{{TotalCosts .CostsWater .CostsWastewater .CostsRainwater}}</td>
+        <td>{{Euro .FixedPrice}}</td>
+        <td>{{TotalCosts .CostsWater .CostsWastewater .CostsRainwater .FixedPrice}}</td>
         <td>{{Euro .Payments}}</td>
         <td>{{Monthly .Payments}}</td>
         <td>{{Difference .Payments (Add .CostsWater .CostsWastewater .CostsRainwater)}}</td>
