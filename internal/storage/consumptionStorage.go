@@ -5,14 +5,14 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
 
-func GetUsageStorage() (models.UsageStorage, error) {
+func GetConsumptionStorage() (models.ConsumptionStorage, error) {
 	bytes, err := readStorage()
 	if err != nil {
-		return models.UsageStorage{}, err
+		return models.ConsumptionStorage{}, err
 	}
-	storage, err := utils.ConvertBytesToUsageStorage(bytes)
+	storage, err := utils.ConvertBytesToConsumptionStorage(bytes)
 	if err != nil {
-		return models.UsageStorage{}, err
+		return models.ConsumptionStorage{}, err
 	}
 	return storage, nil
 }

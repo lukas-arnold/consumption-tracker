@@ -28,6 +28,9 @@ func formatInt(value float64) string {
 }
 
 func formatEuro(value float64) string {
+	if value == 0 {
+		return "-"
+	}
 	return formatFloat(value, 2) + " €"
 }
 
@@ -105,7 +108,7 @@ func handleElectricityView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.New("view.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/electricity/view.html", "templates/electricity/index.html"),
 	)
-	usageStorage, err := storage.GetUsageStorage()
+	consumptionStorage, err := storage.GetConsumptionStorage()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
@@ -115,12 +118,12 @@ func handleElectricityView(w http.ResponseWriter, r *http.Request) {
 		errorHandling(w, 404)
 		log.Print(err)
 	}
-	summary := buildElectricitySummary(usageStorage)
+	summary := buildElectricitySummary(consumptionStorage)
 	view := struct {
-		models.UsageStorage
+		models.ConsumptionStorage
 		Chart   models.ElectricityForChart
 		Summary ConsumptionSummary
-	}{usageStorage, chart, summary}
+	}{consumptionStorage, chart, summary}
 	err = tmpl.Execute(w, view)
 	if err != nil {
 		errorHandling(w, 500)
@@ -132,7 +135,7 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.New("view.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/oil/view.html", "templates/oil/index.html"),
 	)
-	usageStorage, err := storage.GetUsageStorage()
+	consumptionStorage, err := storage.GetConsumptionStorage()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
@@ -142,7 +145,7 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 		errorHandling(w, 404)
 		log.Print(err)
 	}
-	usageStorage.OilFillLevels = fillLevels
+	consumptionStorage.OilFillLevels = fillLevels
 	chart, err := storage.GetOilForChart()
 	if err != nil {
 		errorHandling(w, 404)
@@ -153,13 +156,13 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 		errorHandling(w, 404)
 		log.Print(err)
 	}
-	summary := buildOilSummary(usageStorage)
+	summary := buildOilSummary(consumptionStorage)
 	view := struct {
-		models.UsageStorage
+		models.ConsumptionStorage
 		OilChart       models.OilForChart
 		FillLevelChart models.OilFillLevelForChart
 		Summary        ConsumptionSummary
-	}{usageStorage, chart, fillChart, summary}
+	}{consumptionStorage, chart, fillChart, summary}
 	err = tmpl.Execute(w, view)
 	if err != nil {
 		errorHandling(w, 500)
@@ -168,18 +171,18 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 }
 
 type ConsumptionSummary struct {
-	TotalUsage          float64
-	TotalCosts          float64
-	AverageUsagePerYear float64
-	AverageCostPerUnit  float64
-	YearsCount          int
+	TotalConsumption          float64
+	TotalCosts                float64
+	AverageConsumptionPerYear float64
+	AverageCostPerUnit        float64
+	YearsCount                int
 }
 
 func HandleWaterView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.New("view.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/water/view.html", "templates/water/index.html"),
 	)
-	usageStorage, err := storage.GetUsageStorage()
+	consumptionStorage, err := storage.GetConsumptionStorage()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
@@ -189,12 +192,12 @@ func HandleWaterView(w http.ResponseWriter, r *http.Request) {
 		errorHandling(w, 404)
 		log.Print(err)
 	}
-	summary := buildWaterSummary(usageStorage)
+	summary := buildWaterSummary(consumptionStorage)
 	view := struct {
-		models.UsageStorage
+		models.ConsumptionStorage
 		Chart   models.WaterForChart
 		Summary ConsumptionSummary
-	}{usageStorage, chart, summary}
+	}{consumptionStorage, chart, summary}
 	err = tmpl.Execute(w, view)
 	if err != nil {
 		errorHandling(w, 500)
@@ -202,34 +205,34 @@ func HandleWaterView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func buildElectricitySummary(usageStorage models.UsageStorage) ConsumptionSummary {
+func buildElectricitySummary(consumptionStorage models.ConsumptionStorage) ConsumptionSummary {
 	years := map[string]bool{}
-	totalUsage := 0.0
+	totalConsumption := 0.0
 	totalCosts := 0.0
-	for _, entry := range usageStorage.Electricity {
+	for _, entry := range consumptionStorage.Electricity {
 		if len(entry.TimeFrom) >= 4 {
 			years[entry.TimeFrom[:4]] = true
 		}
-		totalUsage += entry.Usage
+		totalConsumption += entry.Consumption
 		totalCosts += entry.Costs
 	}
 	yearsCount := len(years)
-	averageUsage := 0.0
+	averageConsumption := 0.0
 	if yearsCount > 0 {
-		averageUsage = totalUsage / float64(yearsCount)
+		averageConsumption = totalConsumption / float64(yearsCount)
 	}
 	averageCost := 0.0
-	if totalUsage > 0 {
-		averageCost = totalCosts / totalUsage
+	if totalConsumption > 0 {
+		averageCost = totalCosts / totalConsumption
 	}
-	return ConsumptionSummary{TotalUsage: totalUsage, TotalCosts: totalCosts, AverageUsagePerYear: averageUsage, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
+	return ConsumptionSummary{TotalConsumption: totalConsumption, TotalCosts: totalCosts, AverageConsumptionPerYear: averageConsumption, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
 }
 
-func buildOilSummary(usageStorage models.UsageStorage) ConsumptionSummary {
+func buildOilSummary(consumptionStorage models.ConsumptionStorage) ConsumptionSummary {
 	years := map[string]bool{}
 	totalVolume := 0.0
 	totalCosts := 0.0
-	for _, entry := range usageStorage.Oil {
+	for _, entry := range consumptionStorage.Oil {
 		if len(entry.Date) >= 4 {
 			years[entry.Date[:4]] = true
 		}
@@ -245,14 +248,14 @@ func buildOilSummary(usageStorage models.UsageStorage) ConsumptionSummary {
 	if totalVolume > 0 {
 		averageCost = totalCosts / totalVolume
 	}
-	return ConsumptionSummary{TotalUsage: totalVolume, TotalCosts: totalCosts, AverageUsagePerYear: averageVolume, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
+	return ConsumptionSummary{TotalConsumption: totalVolume, TotalCosts: totalCosts, AverageConsumptionPerYear: averageVolume, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
 }
 
-func buildWaterSummary(usageStorage models.UsageStorage) ConsumptionSummary {
+func buildWaterSummary(consumptionStorage models.ConsumptionStorage) ConsumptionSummary {
 	years := map[string]bool{}
 	totalVolume := 0.0
 	totalCosts := 0.0
-	for _, entry := range usageStorage.Water {
+	for _, entry := range consumptionStorage.Water {
 		years[fmt.Sprint(entry.Year)] = true
 		totalVolume += entry.VolumeWater + entry.VolumeWastewater + entry.VolumeRainwater
 		totalCosts += entry.CostsWater + entry.CostsWastewater + entry.CostsRainwater + entry.FixedPrice
@@ -267,72 +270,10 @@ func buildWaterSummary(usageStorage models.UsageStorage) ConsumptionSummary {
 		averageCost = totalCosts / totalVolume
 	}
 	return ConsumptionSummary{
-		TotalUsage:          totalVolume,
-		TotalCosts:          totalCosts,
-		AverageUsagePerYear: averageVolume,
-		AverageCostPerUnit:  averageCost,
-		YearsCount:          yearsCount,
+		TotalConsumption:          totalVolume,
+		TotalCosts:                totalCosts,
+		AverageConsumptionPerYear: averageVolume,
+		AverageCostPerUnit:        averageCost,
+		YearsCount:                yearsCount,
 	}
 }
-
-func HandleElectricityHistory(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("chart.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/electricity/chart.html"),
-	)
-	chart, err := storage.GetElectricityForChart()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-	}
-	err = tmpl.Execute(w, chart)
-	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
-	}
-}
-
-func HandleElectricityChart(w http.ResponseWriter, r *http.Request) {
-	HandleElectricityHistory(w, r)
-}
-
-func HandleOilHistory(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("chart.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/oil/chart.html"),
-	)
-	chart, err := storage.GetOilForChart()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-	}
-	err = tmpl.Execute(w, chart)
-	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
-	}
-}
-
-func HandleOilChart(w http.ResponseWriter, r *http.Request) {
-	HandleOilHistory(w, r)
-}
-
-func HandleOilFillLevelHistory(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("chart.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/oil/fillchart.html"),
-	)
-	chart, err := storage.GetOilFillLevelForChart()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-	}
-	err = tmpl.Execute(w, chart)
-	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
-	}
-}
-
-func HandleOilFillLevelChart(w http.ResponseWriter, r *http.Request) {
-	HandleOilFillLevelHistory(w, r)
-}
-
-// Water history/chart handlers removed — charts are embedded in the water index page.

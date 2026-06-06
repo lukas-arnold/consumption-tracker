@@ -15,7 +15,7 @@
     "yearsCount": "Years",
     "note": "Note",
 
-    "usage": "Consumption",
+    "consumption": "Consumption",
     "volume": "Volume",
     "volumeWater": "Water Volume",
     "volumeWastewater": "Wastewater Volume",
@@ -55,11 +55,11 @@
     "history": "History",
     "chart": "Chart",
 
-    "totalUsage": "Total Consumption",
+    "totalConsumption": "Total Consumption",
     "totalCosts": "Total Costs",
-    "averageUsagePerYear": "Average Annual Consumption",
+    "averageConsumptionPerYear": "Average Annual Consumption",
     "averageCostPerUnit": "Average Cost per Unit",
-    "usageCostsPerYear": "Consumption and Costs per Year",
+    "consumptionCostsPerYear": "Consumption and Costs per Year",
     "difference": "Difference",
 
     "save": "Save",

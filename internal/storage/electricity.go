@@ -9,7 +9,7 @@ import (
 )
 
 func AddElectricity(electricity models.ElectricityInput) error {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func AddElectricity(electricity models.ElectricityInput) error {
 }
 
 func GetElectricities() ([]models.Electricity, error) {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func GetElectricity(id int64) (models.Electricity, error) {
 }
 
 func UpdateElectricity(electricity models.Electricity) error {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func UpdateElectricity(electricity models.Electricity) error {
 		if storage.Electricity[i].Id == electricity.Id {
 			storage.Electricity[i].TimeFrom = electricity.TimeFrom
 			storage.Electricity[i].TimeTo = electricity.TimeTo
-			storage.Electricity[i].Usage = electricity.Usage
+			storage.Electricity[i].Consumption = electricity.Consumption
 			storage.Electricity[i].Costs = electricity.Costs
 			storage.Electricity[i].Retailer = electricity.Retailer
 			storage.Electricity[i].Payments = electricity.Payments
@@ -68,7 +68,7 @@ func UpdateElectricity(electricity models.Electricity) error {
 }
 
 func DeleteElectricity(id int64) error {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return err
 	}

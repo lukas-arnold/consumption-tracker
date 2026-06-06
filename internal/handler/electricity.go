@@ -28,7 +28,7 @@ func HandleAddElectricityGet(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleAddElectricityPost(w http.ResponseWriter, r *http.Request) {
-	usage, err := utils.ConvertFloat(r.FormValue("usage"))
+	consumption, err := utils.ConvertFloat(r.FormValue("consumption"))
 	if err != nil {
 		errorHandling(w, 500)
 		log.Print(err)
@@ -47,13 +47,13 @@ func HandleAddElectricityPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = storage.AddElectricity(models.ElectricityInput{
-		TimeFrom: r.FormValue("timeFrom"),
-		TimeTo:   r.FormValue("timeTo"),
-		Usage:    usage,
-		Costs:    costs,
-		Retailer: r.FormValue("retailer"),
-		Payments: payments,
-		Note:     r.FormValue("note"),
+		TimeFrom:    r.FormValue("timeFrom"),
+		TimeTo:      r.FormValue("timeTo"),
+		Consumption: consumption,
+		Costs:       costs,
+		Retailer:    r.FormValue("retailer"),
+		Payments:    payments,
+		Note:        r.FormValue("note"),
 	})
 	if err != nil {
 		errorHandling(w, 500)
@@ -98,7 +98,7 @@ func HandleSaveElectricity(w http.ResponseWriter, r *http.Request) {
 		log.Print(err)
 		return
 	}
-	usage, err := utils.ConvertFloat(r.FormValue("usage"))
+	consumption, err := utils.ConvertFloat(r.FormValue("consumption"))
 	if err != nil {
 		errorHandling(w, 500)
 		log.Print(err)
@@ -120,13 +120,13 @@ func HandleSaveElectricity(w http.ResponseWriter, r *http.Request) {
 	entry := models.Electricity{
 		Id: id,
 		ElectricityInput: models.ElectricityInput{
-			TimeFrom: r.FormValue("timeFrom"),
-			TimeTo:   r.FormValue("timeTo"),
-			Usage:    usage,
-			Costs:    costs,
-			Retailer: r.FormValue("retailer"),
-			Payments: payments,
-			Note:     r.FormValue("note"),
+			TimeFrom:    r.FormValue("timeFrom"),
+			TimeTo:      r.FormValue("timeTo"),
+			Consumption: consumption,
+			Costs:       costs,
+			Retailer:    r.FormValue("retailer"),
+			Payments:    payments,
+			Note:        r.FormValue("note"),
 		},
 	}
 

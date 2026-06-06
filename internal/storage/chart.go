@@ -13,8 +13,8 @@ func GetElectricityForChart() (models.ElectricityForChart, error) {
 		return models.ElectricityForChart{}, err
 	}
 	yearTotals := map[string]struct {
-		usage float64
-		costs float64
+		consumption float64
+		costs       float64
 	}{}
 	for _, value := range electricities {
 		year := value.TimeFrom
@@ -22,7 +22,7 @@ func GetElectricityForChart() (models.ElectricityForChart, error) {
 			year = year[:4]
 		}
 		totals := yearTotals[year]
-		totals.usage += value.Usage
+		totals.consumption += value.Consumption
 		totals.costs += value.Costs
 		yearTotals[year] = totals
 	}
@@ -31,18 +31,18 @@ func GetElectricityForChart() (models.ElectricityForChart, error) {
 		labels = append(labels, year)
 	}
 	sort.Strings(labels)
-	var usages, costs, prices []float64
+	var consumptions, costs, prices []float64
 	for _, year := range labels {
 		totals := yearTotals[year]
 		price := 0.0
-		if totals.usage > 0 {
-			price = totals.costs / totals.usage
+		if totals.consumption > 0 {
+			price = totals.costs / totals.consumption
 		}
-		usages = append(usages, totals.usage)
+		consumptions = append(consumptions, totals.consumption)
 		costs = append(costs, totals.costs)
 		prices = append(prices, price)
 	}
-	return models.ElectricityForChart{Electricities: electricities, Labels: labels, Usages: usages, Costs: costs, Prices: prices}, nil
+	return models.ElectricityForChart{Electricities: electricities, Labels: labels, Consumptions: consumptions, Costs: costs, Prices: prices}, nil
 }
 
 func GetOilForChart() (models.OilForChart, error) {

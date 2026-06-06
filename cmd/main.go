@@ -23,10 +23,7 @@ func main() {
 	mux.HandleFunc("GET /", handler.HandleView)
 
 	mux.HandleFunc("GET /electricity", handler.HandleElectricityView)
-	mux.HandleFunc("GET /electricity/history", handler.HandleElectricityHistory)
 	mux.HandleFunc("GET /oil", handler.HandleOilView)
-	mux.HandleFunc("GET /oil/history", handler.HandleOilHistory)
-	mux.HandleFunc("GET /oil-fill-level/history", handler.HandleOilFillLevelHistory)
 	mux.HandleFunc("GET /water", handler.HandleWaterView)
 
 	mux.HandleFunc("GET /electricity/add", handler.HandleAddElectricityGet)

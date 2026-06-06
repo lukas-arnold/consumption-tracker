@@ -9,7 +9,7 @@ import (
 )
 
 func AddWater(water models.WaterInput) error {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func AddWater(water models.WaterInput) error {
 }
 
 func GetWater() ([]models.Water, error) {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func GetWaterEntry(id int64) (models.Water, error) {
 }
 
 func UpdateWater(water models.Water) error {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -71,7 +71,7 @@ func UpdateWater(water models.Water) error {
 }
 
 func DeleteWater(id int64) error {
-	storage, err := GetUsageStorage()
+	storage, err := GetConsumptionStorage()
 	if err != nil {
 		return err
 	}

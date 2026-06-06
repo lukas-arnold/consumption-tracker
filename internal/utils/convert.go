@@ -7,7 +7,7 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 )
 
-func ConvertUsageStorageToBytes(storage models.UsageStorage) ([]byte, error) {
+func ConvertConsumptionStorageToBytes(storage models.ConsumptionStorage) ([]byte, error) {
 	bytes, err := json.Marshal(storage)
 	if err != nil {
 		return nil, err
@@ -15,8 +15,8 @@ func ConvertUsageStorageToBytes(storage models.UsageStorage) ([]byte, error) {
 	return bytes, nil
 }
 
-func ConvertBytesToUsageStorage(bytes []byte) (models.UsageStorage, error) {
-	var storage models.UsageStorage
+func ConvertBytesToConsumptionStorage(bytes []byte) (models.ConsumptionStorage, error) {
+	var storage models.ConsumptionStorage
 	err := json.Unmarshal(bytes, &storage)
 	if err != nil {
 		return storage, err

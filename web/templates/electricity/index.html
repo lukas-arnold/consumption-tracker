@@ -9,7 +9,7 @@
   </style>
 
   <div class="chart-full">
-    <h3 class="center">{{T "usageCostsPerYear"}}</h3>
+    <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
     <canvas id="yearChart" class="chart-canvas"></canvas>
   </div>
   <div class="chart-full">
@@ -18,16 +18,16 @@
   </div>
 <div class="grid" style="gap:1rem; margin:1rem 0;">
   <article class="card">
-    <strong>{{T "totalUsage"}}</strong>
-    <div>{{Int .Summary.TotalUsage}} kWh</div>
+    <strong>{{T "totalConsumption"}}</strong>
+    <div>{{Int .Summary.TotalConsumption}} kWh</div>
   </article>
   <article class="card">
     <strong>{{T "totalCosts"}}</strong>
     <div>{{Euro .Summary.TotalCosts}}</div>
   </article>
   <article class="card">
-    <strong>{{T "averageUsagePerYear"}}</strong>
-    <div>{{Int .Summary.AverageUsagePerYear}} kWh</div>
+    <strong>{{T "averageConsumptionPerYear"}}</strong>
+    <div>{{Int .Summary.AverageConsumptionPerYear}} kWh</div>
   </article>
   <article class="card">
     <strong>{{T "averageCostPerUnit"}}</strong>
@@ -39,7 +39,7 @@
     <thead>
       <tr>
         <th>{{T "period"}}</th>
-        <th>{{T "usage"}}</th>
+        <th>{{T "consumption"}}</th>
         <th>{{T "pricePerUnit"}}</th>
         <th>{{T "costs"}}</th>
         <th>{{T "retailer"}}</th>
@@ -57,8 +57,8 @@
           <div class="date">{{.TimeFrom}}</div>
           <div class="date">{{.TimeTo}}</div>
         </td>
-        <td>{{Int .Usage}} kWh</td>
-        <td>{{Price .Costs .Usage "kWh"}}</td>
+        <td>{{Int .Consumption}} kWh</td>
+        <td>{{Price .Costs .Consumption "kWh"}}</td>
         <td>{{Euro .Costs}}</td>
         <td>{{.Retailer}}</td>
         <td>{{Euro .Payments}}</td>
@@ -101,8 +101,8 @@
     data: {
       labels: [{{range $i,$label:=.Chart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
       datasets: [{
-        label: '{{T "usage"}}',
-        data: [{{range $i,$v:=.Chart.Usages}}{{if $i}},{{end}}{{$v}}{{end}}]
+        label: '{{T "consumption"}}',
+        data: [{{range $i,$v:=.Chart.Consumptions}}{{if $i}},{{end}}{{$v}}{{end}}]
       }, {
         label: '{{T "costs"}}',
         data: [{{range $i,$v:=.Chart.Costs}}{{if $i}},{{end}}{{$v}}{{end}}],

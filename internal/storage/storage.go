@@ -8,9 +8,9 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
 
-func saveStorage(storage models.UsageStorage) error {
+func saveStorage(storage models.ConsumptionStorage) error {
 	storage = sortStorage(storage)
-	bytes, err := utils.ConvertUsageStorageToBytes(storage)
+	bytes, err := utils.ConvertConsumptionStorageToBytes(storage)
 	if err != nil {
 		return err
 	}
@@ -33,11 +33,11 @@ func readStorage() ([]byte, error) {
 func checkStorage() {
 	_, err := os.ReadFile(configs.GetStorageFile())
 	if err != nil {
-		saveStorage(models.UsageStorage{})
+		saveStorage(models.ConsumptionStorage{})
 	}
 }
 
-func sortStorage(storage models.UsageStorage) models.UsageStorage {
+func sortStorage(storage models.ConsumptionStorage) models.ConsumptionStorage {
 	storage.Electricity = sortElectricity(storage.Electricity)
 	storage.Oil = sortOil(storage.Oil)
 	storage.OilFillLevels = sortOilFillLevels(storage.OilFillLevels)

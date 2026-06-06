@@ -14,7 +14,7 @@
     <canvas id="fillChart" class="chart-canvas chart-canvas--fill"></canvas>
   </div>
   <div class="chart-full">
-    <h3 class="center">{{T "usageCostsPerYear"}}</h3>
+    <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
     <canvas id="yearChart" class="chart-canvas"></canvas>
   </div>
   <div class="chart-full">
@@ -23,16 +23,16 @@
   </div>
 <div class="grid" style="gap:1rem; margin:1rem 0;">
   <article class="card">
-    <strong>{{T "totalUsage"}}</strong>
-    <div>{{Int .Summary.TotalUsage}} l</div>
+    <strong>{{T "totalConsumption"}}</strong>
+    <div>{{Int .Summary.TotalConsumption}} l</div>
   </article>
   <article class="card">
     <strong>{{T "totalCosts"}}</strong>
     <div>{{Euro .Summary.TotalCosts}}</div>
   </article>
   <article class="card">
-    <strong>{{T "averageUsagePerYear"}}</strong>
-    <div>{{Int .Summary.AverageUsagePerYear}} l</div>
+    <strong>{{T "averageConsumptionPerYear"}}</strong>
+    <div>{{Int .Summary.AverageConsumptionPerYear}} l</div>
   </article>
   <article class="card">
     <strong>{{T "averageCostPerUnit"}}</strong>

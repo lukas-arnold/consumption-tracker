@@ -1,6 +1,6 @@
 package models
 
-type UsageStorage struct {
+type ConsumptionStorage struct {
 	Electricity   []Electricity  `json:"Electricity"`
 	Oil           []Oil          `json:"Oil"`
 	OilFillLevels []OilFillLevel `json:"OilFillLevels"`
@@ -10,7 +10,7 @@ type UsageStorage struct {
 type ElectricityForChart struct {
 	Electricities []Electricity
 	Labels        []string
-	Usages        []float64
+	Consumptions  []float64
 	Costs         []float64
 	Prices        []float64
 }
@@ -30,19 +30,19 @@ type OilFillLevelForChart struct {
 }
 
 type WaterForChart struct {
-	Waters  []Water
-	Labels  []string
-	Volumes []float64
-	VolumesWater []float64
+	Waters            []Water
+	Labels            []string
+	Volumes           []float64
+	VolumesWater      []float64
 	VolumesWastewater []float64
-	VolumesRainwater []float64
-	Costs   []float64
-	CostsWater []float64
-	CostsWastewater []float64
-	CostsRainwater []float64
-	Prices  []float64
-	PricesWater []float64
-	PricesWastewater []float64
-	PricesRainwater []float64
-	FixedPrices []float64
+	VolumesRainwater  []float64
+	Costs             []float64
+	CostsWater        []float64
+	CostsWastewater   []float64
+	CostsRainwater    []float64
+	Prices            []float64
+	PricesWater       []float64
+	PricesWastewater  []float64
+	PricesRainwater   []float64
+	FixedPrices       []float64
 }
