@@ -1,23 +1,16 @@
 {{define "water"}}
 <h2 class="center">{{T "water"}}</h2>
-  <style>
-    .chart-full { width:100%; margin:0 auto 30px auto; }
-    .chart-canvas { display:block; width:100%; height:360px; max-height:700px; }
-    .chart-canvas--price { height:300px; }
-    td { word-break: break-word; }
-    td:nth-last-child(2) { white-space: normal; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
-  </style>
 
-  <div class="chart-full">
+  <div>
     <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
-    <canvas id="combinedChart" class="chart-canvas"></canvas>
+    <canvas id="yearChart"></canvas>
   </div>
 
   <div class="chart-full">
     <h3 class="center">{{T "pricePerUnit"}}</h3>
-    <canvas id="priceChart" class="chart-canvas chart-canvas--price"></canvas>
+    <canvas id="priceChart"></canvas>
   </div>
-<div class="grid" style="gap:1rem; margin:1rem 0;">
+<div class="grid">
   <article class="card">
     <strong>{{T "totalConsumption"}}</strong>
     <div>{{Int .Summary.TotalConsumption}} m³</div>
@@ -35,9 +28,9 @@
     <div>{{Euro .Summary.AverageCostPerUnit}} /m³</div>
   </article>
 </div>
-<!-- Removed Total Wastewater / Total Rainwater / Total Fixed Price cards per request -->
-<div class="table-cards" style="overflow-x: auto;">
-  <table style="min-width:1200px; width:auto; white-space:nowrap;">
+
+<div class="table-wrapper">
+  <table>
     <thead>
       <tr>
         <th>{{T "year"}}</th>
@@ -77,7 +70,7 @@
         <td>{{Euro .Payments}}</td>
         <td>{{Monthly .Payments}}</td>
         <td>{{Difference .Payments (Add .CostsWater .CostsWastewater .CostsRainwater)}}</td>
-        <td style="white-space: normal; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word;">{{.Note}}</td>
+        <td>{{.Note}}</td>
         <td>
           <article>
             <form action="/water/edit/{{.Id}}">
@@ -107,9 +100,8 @@
     return isNaN(num) ? value : num.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
   }
 
-  // Combined chart: volumes (bars) and costs (lines) in one chart
-  const combinedCtx = document.getElementById('combinedChart');
-  new Chart(combinedCtx, {
+  const yearCtx = document.getElementById('yearChart');
+  new Chart(yearCtx, {
     type: 'line',
     data: {
       labels: [{{range $i, $year := .Chart.Labels}}{{if $i}}, {{end}}"{{$year}}"{{end}}],
@@ -137,8 +129,6 @@
       ]
     },
     options: {
-      responsive: true,
-      interaction: {mode:'index', intersect:false},
       plugins: {
         legend: { display: true, position: 'top' },
         tooltip: {
@@ -168,7 +158,6 @@
     }
   });
 
-  // Price-per-unit chart (water, wastewater, rainwater, fixed)
   const priceCtx = document.getElementById('priceChart');
   new Chart(priceCtx, {
     type: 'line',
@@ -190,8 +179,6 @@
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
       plugins: {
         legend: { display: true, position: 'top' },
         tooltip: {

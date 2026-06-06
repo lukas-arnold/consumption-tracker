@@ -1,22 +1,16 @@
 {{define "electricity"}}
 <h2 class="center">{{T "electricity"}}</h2>
-  <style>
-    .chart-full { width:100%; margin:0 auto 30px auto; }
-    .chart-canvas { display:block; width:100%; height:360px; max-height:600px; }
-    .chart-canvas--price { height:300px; }
-    td { word-break: break-word; }
-    td:nth-last-child(2) { white-space: normal; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word; }
-  </style>
 
-  <div class="chart-full">
-    <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
-    <canvas id="yearChart" class="chart-canvas"></canvas>
-  </div>
-  <div class="chart-full">
-    <h3 class="center">{{T "pricePerUnit"}}</h3>
-    <canvas id="priceChart" class="chart-canvas chart-canvas--price"></canvas>
-  </div>
-<div class="grid" style="gap:1rem; margin:1rem 0;">
+<div>
+  <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
+  <canvas id="yearChart"></canvas>
+</div>
+<div>
+  <h3 class="center">{{T "pricePerUnit"}}</h3>
+  <canvas id="priceChart"></canvas>
+</div>
+
+<div class="grid">
   <article class="card">
     <strong>{{T "totalConsumption"}}</strong>
     <div>{{Int .Summary.TotalConsumption}} kWh</div>
@@ -34,8 +28,9 @@
     <div>{{Euro .Summary.AverageCostPerUnit}} /kWh</div>
   </article>
 </div>
-<div class="table-cards" style="overflow-x: auto;">
-  <table style="min-width:1200px; width:100%; white-space:nowrap;">
+
+<div class="table-wrapper">
+  <table>
     <thead>
       <tr>
         <th>{{T "period"}}</th>
@@ -64,7 +59,7 @@
         <td>{{Euro .Payments}}</td>
         <td>{{Monthly .Payments}}</td>
         <td>{{Difference .Payments .Costs}}</td>
-        <td style="white-space: normal; word-break: break-word; word-wrap: break-word; overflow-wrap: break-word;">{{.Note}}</td>
+        <td>{{.Note}}</td>
         <td>
           <article>
             <form action="/electricity/edit/{{.Id}}">
@@ -110,9 +105,6 @@
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {mode:'index', intersect:false},
       plugins: {
         tooltip: {
           callbacks: {
@@ -149,8 +141,6 @@
       }]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
       plugins: {
         legend: { display: true, position: 'top' },
         tooltip: {
