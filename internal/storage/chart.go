@@ -4,8 +4,14 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/lukas-arnold/consumption-tracker/internal/configs"
+	"github.com/lukas-arnold/consumption-tracker/internal/language"
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 )
+
+func getLanguage() string {
+	return configs.GetLanguage()
+}
 
 func GetElectricityCharts() (models.ElectricityCharts, error) {
 	electricities, err := GetElectricities()
@@ -58,14 +64,16 @@ func GetElectricityCharts() (models.ElectricityCharts, error) {
 			Labels: labels,
 			Sets: []models.ChartDataset{
 				{
-					Label: "Consumption",
+					Label: language.T(configs.GetLanguage(), "consumption"),
 					Data:  consumption,
 					Unit:  "kWh",
+					YAxis: "y",
 				},
 				{
-					Label: "Costs",
+					Label: language.T(configs.GetLanguage(), "costs"),
 					Data:  costs,
 					Unit:  "€",
+					YAxis: "y1",
 				},
 			},
 		},
@@ -73,7 +81,7 @@ func GetElectricityCharts() (models.ElectricityCharts, error) {
 			Labels: labels,
 			Sets: []models.ChartDataset{
 				{
-					Label: "Price per unit",
+					Label: language.T(configs.GetLanguage(), "pricePerUnit"),
 					Data:  prices,
 					Unit:  "€/kWh",
 				},
@@ -151,14 +159,16 @@ func GetOilCharts() (models.OilCharts, error) {
 			Labels: labels,
 			Sets: []models.ChartDataset{
 				{
-					Label: "Consumption",
+					Label: language.T(configs.GetLanguage(), "volume"),
 					Data:  volumes,
 					Unit:  "l",
+					YAxis: "y",
 				},
 				{
-					Label: "Costs",
+					Label: language.T(configs.GetLanguage(), "costs"),
 					Data:  costs,
 					Unit:  "€",
+					YAxis: "y1",
 				},
 			},
 		},
@@ -166,7 +176,7 @@ func GetOilCharts() (models.OilCharts, error) {
 			Labels: labels,
 			Sets: []models.ChartDataset{
 				{
-					Label: "Price per liter",
+					Label: language.T(configs.GetLanguage(), "pricePerUnit"),
 					Data:  prices,
 					Unit:  "€/l",
 				},
@@ -176,7 +186,7 @@ func GetOilCharts() (models.OilCharts, error) {
 			Labels: fillDates,
 			Sets: []models.ChartDataset{
 				{
-					Label: "Fill level",
+					Label: language.T(configs.GetLanguage(), "levelCm"),
 					Data:  fillValues,
 					Unit:  "cm",
 				},
@@ -192,16 +202,36 @@ func GetWaterCharts() (models.WaterCharts, error) {
 	}
 
 	type totals struct {
-		volume float64
-		costs  float64
+		volumeWater      float64
+		volumeWastewater float64
+		volumeRainwater  float64
+
+		costsWater      float64
+		costsWastewater float64
+		costsRainwater  float64
+
+		fixedPriceSum float64
+		fixedCount    int
 	}
 
 	yearTotals := map[int]totals{}
 
 	for _, v := range waters {
 		t := yearTotals[v.Year]
-		t.volume += v.VolumeWater + v.VolumeWastewater + v.VolumeRainwater
-		t.costs += v.CostsWater + v.CostsWastewater + v.CostsRainwater
+
+		t.volumeWater += v.VolumeWater
+		t.volumeWastewater += v.VolumeWastewater
+		t.volumeRainwater += v.VolumeRainwater
+
+		t.costsWater += v.CostsWater
+		t.costsWastewater += v.CostsWastewater
+		t.costsRainwater += v.CostsRainwater
+
+		if v.FixedPrice > 0 {
+			t.fixedPriceSum += v.FixedPrice
+			t.fixedCount++
+		}
+
 		yearTotals[v.Year] = t
 	}
 
@@ -212,20 +242,52 @@ func GetWaterCharts() (models.WaterCharts, error) {
 	sort.Ints(years)
 
 	var labels []string
-	var volumes, costs, prices []float64
+
+	// consumption chart
+	var volWater, volWaste, costWater, costWaste []float64
+
+	// price chart
+	var priceWater, priceWaste, priceRain, fixedPrices []float64
 
 	for _, y := range years {
 		t := yearTotals[y]
-
 		labels = append(labels, fmt.Sprintf("%d", y))
-		volumes = append(volumes, t.volume)
-		costs = append(costs, t.costs)
 
-		price := 0.0
-		if t.volume > 0 {
-			price = t.costs / t.volume
+		// Wastewater = wastewater + rainwater
+		wasteVolume := t.volumeWastewater + t.volumeRainwater
+		wasteCosts := t.costsWastewater + t.costsRainwater
+
+		volWater = append(volWater, t.volumeWater)
+		volWaste = append(volWaste, wasteVolume)
+
+		costWater = append(costWater, t.costsWater)
+		costWaste = append(costWaste, wasteCosts)
+
+		// --- Prices ---
+		pw := 0.0
+		if t.volumeWater > 0 {
+			pw = t.costsWater / t.volumeWater
 		}
-		prices = append(prices, price)
+
+		pww := 0.0
+		if wasteVolume > 0 {
+			pww = wasteCosts / wasteVolume
+		}
+
+		pr := 0.0
+		if t.volumeRainwater > 0 {
+			pr = t.costsRainwater / t.volumeRainwater
+		}
+
+		fp := 0.0
+		if t.fixedCount > 0 {
+			fp = t.fixedPriceSum / float64(t.fixedCount)
+		}
+
+		priceWater = append(priceWater, pw)
+		priceWaste = append(priceWaste, pww)
+		priceRain = append(priceRain, pr)
+		fixedPrices = append(fixedPrices, fp)
 	}
 
 	return models.WaterCharts{
@@ -233,24 +295,55 @@ func GetWaterCharts() (models.WaterCharts, error) {
 			Labels: labels,
 			Sets: []models.ChartDataset{
 				{
-					Label: "Consumption",
-					Data:  volumes,
+					Label: language.T(configs.GetLanguage(), "volumeWater"),
+					Data:  volWater,
 					Unit:  "m³",
+					YAxis: "y",
 				},
 				{
-					Label: "Costs",
-					Data:  costs,
+					Label: language.T(configs.GetLanguage(), "volumeWastewater"),
+					Data:  volWaste,
+					Unit:  "m³",
+					YAxis: "y",
+				},
+				{
+					Label: language.T(configs.GetLanguage(), "costsWater"),
+					Data:  costWater,
 					Unit:  "€",
+					YAxis: "y1",
+				},
+				{
+					Label: language.T(configs.GetLanguage(), "costsWastewater"),
+					Data:  costWaste,
+					Unit:  "€",
+					YAxis: "y1",
 				},
 			},
 		},
+
 		Price: models.ChartModel{
 			Labels: labels,
 			Sets: []models.ChartDataset{
 				{
-					Label: "Price per m³",
-					Data:  prices,
+					Label: language.T(configs.GetLanguage(), "priceWater"),
+					Data:  priceWater,
 					Unit:  "€/m³",
+				},
+				{
+					Label: language.T(configs.GetLanguage(), "priceWastewater"),
+					Data:  priceWaste,
+					Unit:  "€/m³",
+				},
+				{
+					Label: language.T(configs.GetLanguage(), "priceRainwater"),
+					Data:  priceRain,
+					Unit:  "€/m³",
+				},
+				{
+					Label:  language.T(configs.GetLanguage(), "fixedPrice"),
+					Data:   fixedPrices,
+					Unit:   "€",
+					Hidden: true,
 				},
 			},
 		},

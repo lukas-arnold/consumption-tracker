@@ -4,53 +4,76 @@ Chart.defaults.interaction = {
     intersect: false
 };
 
+function isIsoDate(value) {
+    return typeof value === "string" &&
+        /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+function formatDate(value) {
+    const date = new Date(value);
+
+    return date.toLocaleDateString("de-DE", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+    });
+}
+
+function formatValue(value, unit) {
+    if (value == null) return value;
+
+    const num = Number(value);
+
+    if (unit === "€" || unit === "€/kWh" || unit === "€/l" || unit === "€/m³") {
+        return num.toLocaleString("de-DE", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }) + " " + unit;
+    }
+
+    if (unit === "kWh" || unit === "l" || unit === "m³") {
+        return num.toLocaleString("de-DE", {
+            maximumFractionDigits: 0
+        }) + " " + unit;
+    }
+
+    if (unit === "cm") {
+        return num.toLocaleString("de-DE", {
+            maximumFractionDigits: 1
+        }) + " cm";
+    }
+
+    return num;
+}
+
 function renderChart(canvasId, model) {
     const ctx = document.getElementById(canvasId);
 
     const datasets = model.sets.map(s => ({
         label: s.label,
-        data: s.data
+        data: s.data,
+        yAxisID: s.yAxis || "y",
+        hidden: s.hidden || false
     }));
 
-    const hasMultipleSets = model.sets.length > 1;
+    const yAxes = {};
 
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            mode: "index",
-            intersect: false
-        },
-        plugins: {
-            tooltip: {
-                callbacks: {
-                    label: function (context) {
-                        const ds = model.sets[context.datasetIndex];
-                        const value = context.raw;
-
-                        if (!ds.unit) return context.dataset.label + ": " + value;
-
-                        return context.dataset.label + ": " + value + " " + ds.unit;
+    model.sets.forEach(s => {
+        const axis = s.yAxis || "y";
+        if (!yAxes[axis]) {
+            yAxes[axis] = {
+                type: "linear",
+                position: axis === "y1" ? "right" : "left",
+                beginAtZero: true,
+                grid: axis === "y1" ? { drawOnChartArea: false } : undefined,
+                ticks: {
+                    callback: function(value) {
+                        return formatValue(value, s.unit);
                     }
                 }
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true
-            }
+            };
         }
-    };
-
-    // If there are multiple sets, assign the second set to a secondary y-axis
-    if (hasMultipleSets) {
-        options.scales.y1 = {
-            position: "right",
-            grid: {
-                drawOnChartArea: false
-            }
-        };
-    }
+    });
 
     new Chart(ctx, {
         type: model.type || "line",
@@ -58,6 +81,42 @@ function renderChart(canvasId, model) {
             labels: model.labels,
             datasets
         },
-        options
+        options: {
+            scales: {
+                x: {
+                    ticks: {
+                        callback: function(value) {
+                            const label = this.getLabelForValue(value);
+
+                            if (isIsoDate(label)) {
+                                return formatDate(label);
+                            }
+
+                            return label;
+                        }
+                    }
+                },
+                ...yAxes
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: (items) => {
+                            const label = items[0].label;
+
+                            if (isIsoDate(label)) {
+                                return formatDate(label);
+                            }
+
+                            return label;
+                        },
+                        label: (ctx) => {
+                            const unit = model.sets[ctx.datasetIndex]?.unit || "";
+                            return `${ctx.dataset.label}: ${formatValue(ctx.raw, unit)}`;
+                        }
+                    }
+                }
+            }
+        }
     });
 }
