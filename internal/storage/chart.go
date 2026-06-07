@@ -7,129 +7,204 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 )
 
-func GetElectricityForChart() (models.ElectricityForChart, error) {
+func GetElectricityCharts() (models.ElectricityCharts, error) {
 	electricities, err := GetElectricities()
 	if err != nil {
-		return models.ElectricityForChart{}, err
+		return models.ElectricityCharts{}, err
 	}
-	yearTotals := map[string]struct {
+
+	type totals struct {
 		consumption float64
 		costs       float64
-	}{}
-	for _, value := range electricities {
-		year := value.TimeFrom
+	}
+
+	yearTotals := map[string]totals{}
+
+	for _, v := range electricities {
+		year := v.TimeFrom
 		if len(year) >= 4 {
 			year = year[:4]
 		}
-		totals := yearTotals[year]
-		totals.consumption += value.Consumption
-		totals.costs += value.Costs
-		yearTotals[year] = totals
+
+		t := yearTotals[year]
+		t.consumption += v.Consumption
+		t.costs += v.Costs
+		yearTotals[year] = t
 	}
+
 	var labels []string
-	for year := range yearTotals {
-		labels = append(labels, year)
+	for y := range yearTotals {
+		labels = append(labels, y)
 	}
 	sort.Strings(labels)
-	var consumptions, costs, prices []float64
-	for _, year := range labels {
-		totals := yearTotals[year]
+
+	var consumption, costs, prices []float64
+
+	for _, y := range labels {
+		t := yearTotals[y]
+
+		consumption = append(consumption, t.consumption)
+		costs = append(costs, t.costs)
+
 		price := 0.0
-		if totals.consumption > 0 {
-			price = totals.costs / totals.consumption
+		if t.consumption > 0 {
+			price = t.costs / t.consumption
 		}
-		consumptions = append(consumptions, totals.consumption)
-		costs = append(costs, totals.costs)
 		prices = append(prices, price)
 	}
-	return models.ElectricityForChart{Electricities: electricities, Labels: labels, Consumptions: consumptions, Costs: costs, Prices: prices}, nil
+
+	return models.ElectricityCharts{
+		Consumption: models.ChartModel{
+			Labels: labels,
+			Sets: []models.ChartDataset{
+				{
+					Label: "Consumption",
+					Data:  consumption,
+					Unit:  "kWh",
+				},
+				{
+					Label: "Costs",
+					Data:  costs,
+					Unit:  "€",
+				},
+			},
+		},
+		Price: models.ChartModel{
+			Labels: labels,
+			Sets: []models.ChartDataset{
+				{
+					Label: "Price per unit",
+					Data:  prices,
+					Unit:  "€/kWh",
+				},
+			},
+		},
+	}, nil
 }
 
-func GetOilForChart() (models.OilForChart, error) {
+func GetOilCharts() (models.OilCharts, error) {
 	oils, err := GetOil()
 	if err != nil {
-		return models.OilForChart{}, err
+		return models.OilCharts{}, err
 	}
-	yearTotals := map[string]struct {
+
+	type totals struct {
 		volume float64
 		costs  float64
-	}{}
-	for _, value := range oils {
-		year := value.Date
+	}
+
+	yearTotals := map[string]totals{}
+
+	for _, v := range oils {
+		year := v.Date
 		if len(year) >= 4 {
 			year = year[:4]
 		}
-		totals := yearTotals[year]
-		totals.volume += value.Volume
-		totals.costs += value.Costs
-		yearTotals[year] = totals
+
+		t := yearTotals[year]
+		t.volume += v.Volume
+		t.costs += v.Costs
+		yearTotals[year] = t
 	}
+
 	var labels []string
-	for year := range yearTotals {
-		labels = append(labels, year)
+	for y := range yearTotals {
+		labels = append(labels, y)
 	}
 	sort.Strings(labels)
+
 	var volumes, costs, prices []float64
-	for _, year := range labels {
-		totals := yearTotals[year]
+
+	for _, y := range labels {
+		t := yearTotals[y]
+
+		volumes = append(volumes, t.volume)
+		costs = append(costs, t.costs)
+
 		price := 0.0
-		if totals.volume > 0 {
-			price = totals.costs / totals.volume
+		if t.volume > 0 {
+			price = t.costs / t.volume
 		}
-		volumes = append(volumes, totals.volume)
-		costs = append(costs, totals.costs)
 		prices = append(prices, price)
 	}
-	return models.OilForChart{Oils: oils, Labels: labels, Volumes: volumes, Costs: costs, Prices: prices}, nil
-}
 
-func GetOilFillLevelForChart() (models.OilFillLevelForChart, error) {
+	// Fill levels
 	fillLevels, err := GetOilFillLevels()
 	if err != nil {
-		return models.OilFillLevelForChart{}, err
+		return models.OilCharts{}, err
 	}
+
 	sort.Slice(fillLevels, func(i, j int) bool {
 		return fillLevels[i].Date < fillLevels[j].Date
 	})
-	var dates []string
-	var levels []float64
-	for _, value := range fillLevels {
-		dates = append(dates, value.Date)
-		levels = append(levels, value.Level)
+
+	var fillDates []string
+	var fillValues []float64
+
+	for _, v := range fillLevels {
+		fillDates = append(fillDates, v.Date)
+		fillValues = append(fillValues, v.Level)
 	}
-	return models.OilFillLevelForChart{OilFillLevels: fillLevels, Dates: dates, Levels: levels}, nil
+
+	return models.OilCharts{
+		Consumption: models.ChartModel{
+			Labels: labels,
+			Sets: []models.ChartDataset{
+				{
+					Label: "Consumption",
+					Data:  volumes,
+					Unit:  "l",
+				},
+				{
+					Label: "Costs",
+					Data:  costs,
+					Unit:  "€",
+				},
+			},
+		},
+		Price: models.ChartModel{
+			Labels: labels,
+			Sets: []models.ChartDataset{
+				{
+					Label: "Price per liter",
+					Data:  prices,
+					Unit:  "€/l",
+				},
+			},
+		},
+		FillLevel: models.ChartModel{
+			Labels: fillDates,
+			Sets: []models.ChartDataset{
+				{
+					Label: "Fill level",
+					Data:  fillValues,
+					Unit:  "cm",
+				},
+			},
+		},
+	}, nil
 }
 
-func GetWaterForChart() (models.WaterForChart, error) {
+func GetWaterCharts() (models.WaterCharts, error) {
 	waters, err := GetWater()
 	if err != nil {
-		return models.WaterForChart{}, err
+		return models.WaterCharts{}, err
 	}
-	// Aggregate per-year totals separately for water, wastewater and rainwater
-	yearTotals := map[int]struct {
-		volumeWater      float64
-		volumeWastewater float64
-		volumeRainwater  float64
-		costsWater       float64
-		costsWastewater  float64
-		costsRainwater   float64
-		totalFixedPrice  float64
-		fixedCount       int
-	}{}
+
+	type totals struct {
+		volume float64
+		costs  float64
+	}
+
+	yearTotals := map[int]totals{}
+
 	for _, v := range waters {
 		t := yearTotals[v.Year]
-		t.volumeWater += v.VolumeWater
-		t.volumeWastewater += v.VolumeWastewater
-		t.volumeRainwater += v.VolumeRainwater
-		t.costsWater += v.CostsWater
-		t.costsWastewater += v.CostsWastewater
-		t.costsRainwater += v.CostsRainwater
-		if v.FixedPrice > 0 {
-			t.totalFixedPrice += v.FixedPrice
-			t.fixedCount++
-		}
+		t.volume += v.VolumeWater + v.VolumeWastewater + v.VolumeRainwater
+		t.costs += v.CostsWater + v.CostsWastewater + v.CostsRainwater
 		yearTotals[v.Year] = t
 	}
+
 	var years []int
 	for y := range yearTotals {
 		years = append(years, y)
@@ -137,73 +212,47 @@ func GetWaterForChart() (models.WaterForChart, error) {
 	sort.Ints(years)
 
 	var labels []string
-	var volumes, volumesWater, volumesWastewater, volumesRainwater []float64
-	var costs, costsWater, costsWastewater, costsRainwater []float64
-	var prices []float64
-	var pricesWater, pricesWastewater, pricesRainwater, fixedPrices []float64
+	var volumes, costs, prices []float64
+
 	for _, y := range years {
-		labels = append(labels, fmt.Sprintf("%d", y))
 		t := yearTotals[y]
-		totalVolume := t.volumeWater + t.volumeWastewater + t.volumeRainwater
-		totalCosts := t.costsWater + t.costsWastewater + t.costsRainwater
 
-		// compute per-type prices (cost / volume) when possible
-		priceWater := 0.0
-		if t.volumeWater > 0 {
-			priceWater = t.costsWater / t.volumeWater
-		}
-		priceWastewater := 0.0
-		if t.volumeWastewater > 0 {
-			priceWastewater = t.costsWastewater / t.volumeWastewater
-		}
-		priceRainwater := 0.0
-		if t.volumeRainwater > 0 {
-			priceRainwater = t.costsRainwater / t.volumeRainwater
-		}
-		fixedPrice := 0.0
-		if t.fixedCount > 0 {
-			fixedPrice = t.totalFixedPrice / float64(t.fixedCount)
-		}
+		labels = append(labels, fmt.Sprintf("%d", y))
+		volumes = append(volumes, t.volume)
+		costs = append(costs, t.costs)
 
-		volumes = append(volumes, totalVolume)
-		volumesWater = append(volumesWater, t.volumeWater)
-		volumesWastewater = append(volumesWastewater, t.volumeWastewater)
-		volumesRainwater = append(volumesRainwater, t.volumeRainwater)
-
-		costs = append(costs, totalCosts)
-		costsWater = append(costsWater, t.costsWater)
-		costsWastewater = append(costsWastewater, t.costsWastewater)
-		costsRainwater = append(costsRainwater, t.costsRainwater)
-
-		prices = append(prices, 0) // legacy/unused combined price kept as placeholder
-		pricesWater = append(pricesWater, priceWater)
-		pricesWastewater = append(pricesWastewater, priceWastewater)
-		pricesRainwater = append(pricesRainwater, priceRainwater)
-		fixedPrices = append(fixedPrices, fixedPrice)
+		price := 0.0
+		if t.volume > 0 {
+			price = t.costs / t.volume
+		}
+		prices = append(prices, price)
 	}
 
-	// For the chart, compute combined wastewater volumes and costs (wastewater + rainwater), as they are typically not separated in the bill
-	var _volumesWastewater []float64
-	var _costsWastewater []float64
-	for i := range volumesWastewater {
-		_volumesWastewater = append(_volumesWastewater, volumesWastewater[i]+volumesRainwater[i])
-		_costsWastewater = append(_costsWastewater, costsWastewater[i]+costsRainwater[i])
-	}
-	return models.WaterForChart{
-		Waters:            waters,
-		Labels:            labels,
-		Volumes:           volumes,
-		VolumesWater:      volumesWater,
-		VolumesWastewater: _volumesWastewater,
-		VolumesRainwater:  volumesRainwater,
-		Costs:             costs,
-		CostsWater:        costsWater,
-		CostsWastewater:   _costsWastewater,
-		CostsRainwater:    costsRainwater,
-		Prices:            prices,
-		PricesWater:       pricesWater,
-		PricesWastewater:  pricesWastewater,
-		PricesRainwater:   pricesRainwater,
-		FixedPrices:       fixedPrices,
+	return models.WaterCharts{
+		Consumption: models.ChartModel{
+			Labels: labels,
+			Sets: []models.ChartDataset{
+				{
+					Label: "Consumption",
+					Data:  volumes,
+					Unit:  "m³",
+				},
+				{
+					Label: "Costs",
+					Data:  costs,
+					Unit:  "€",
+				},
+			},
+		},
+		Price: models.ChartModel{
+			Labels: labels,
+			Sets: []models.ChartDataset{
+				{
+					Label: "Price per m³",
+					Data:  prices,
+					Unit:  "€/m³",
+				},
+			},
+		},
 	}, nil
 }

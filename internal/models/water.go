@@ -17,3 +17,8 @@ type Water struct {
 	Id int64 `json:"Id"`
 	WaterInput
 }
+
+type WaterCharts struct {
+	Consumption ChartModel
+	Price       ChartModel
+}

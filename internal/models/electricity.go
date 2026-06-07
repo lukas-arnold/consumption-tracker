@@ -14,3 +14,8 @@ type Electricity struct {
 	Id int64 `json:"Id"`
 	ElectricityInput
 }
+
+type ElectricityCharts struct {
+	Consumption ChartModel
+	Price       ChartModel
+}

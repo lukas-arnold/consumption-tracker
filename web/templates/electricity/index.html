@@ -5,6 +5,7 @@
   <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
   <canvas id="yearChart"></canvas>
 </div>
+
 <div>
   <h3 class="center">{{T "pricePerUnit"}}</h3>
   <canvas id="priceChart"></canvas>
@@ -63,10 +64,14 @@
         <td>
           <article>
             <form action="/electricity/edit/{{.Id}}">
-              <button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
+              <button type="submit" class="secondary">
+                <i class="fa-solid fa-pen"></i>
+              </button>
             </form>
             <form action="/electricity/delete/{{.Id}}">
-              <button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
+              <button type="submit" class="contrast">
+                <i class="fa-solid fa-trash"></i>
+              </button>
             </form>
           </article>
         </td>
@@ -75,92 +80,16 @@
     </tbody>
   </table>
 </div>
+
 <form action="/electricity/add">
-  <button type="submit" class="primary">{{T "addElectricity"}}</button>
+  <button type="submit" class="primary">
+    {{T "addElectricity"}}
+  </button>
 </form>
 
 <script>
-  function formatInteger(value) {
-    const num = parseFloat(value);
-    return isNaN(num) ? value : num.toLocaleString('de-DE', {minimumFractionDigits: 0, maximumFractionDigits: 0});
-  }
-
-  function formatCurrency(value) {
-    const num = parseFloat(value);
-    return isNaN(num) ? value : num.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
-  }
-
-  const yearCtx = document.getElementById('yearChart');
-  new Chart(yearCtx, {
-    type: 'line',
-    data: {
-      labels: [{{range $i,$label:=.Chart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
-      datasets: [{
-        label: '{{T "consumption"}}',
-        data: [{{range $i,$v:=.Chart.Consumptions}}{{if $i}},{{end}}{{$v}}{{end}}]
-      }, {
-        label: '{{T "costs"}}',
-        data: [{{range $i,$v:=.Chart.Costs}}{{if $i}},{{end}}{{$v}}{{end}}],
-        yAxisID: 'y1'
-      }]
-    },
-    options: {
-      plugins: {
-        tooltip: {
-          callbacks: {
-            title: (tooltipItem) => tooltipItem[0].label,
-            label: (tooltipItem) => tooltipItem.dataset.label + ': ' + (tooltipItem.dataset.yAxisID === 'y1' ? tooltipItem.raw.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €' : tooltipItem.raw.toLocaleString('de-DE', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' kWh')
-          }
-        }
-      },
-      scales: {
-        y: {
-          type: 'linear',
-          position: 'left',
-          beginAtZero: true,
-          ticks: { callback: function(value) { return value + ' kWh'; } }
-        },
-        y1: {
-          type: 'linear',
-          position: 'right',
-          grid: {drawOnChartArea: false},
-          ticks: { callback: function(value) { return value.toLocaleString('de-DE') + ' €'; } }
-        }
-      }
-    }
-  });
-
-  const priceCtx = document.getElementById('priceChart');
-  new Chart(priceCtx, {
-    type: 'line',
-    data: {
-      labels: [{{range $i,$label:=.Chart.Labels}}{{if $i}},{{end}}"{{$label}}"{{end}}],
-      datasets: [{
-        label: '{{T "pricePerUnit"}}',
-        data: [{{range $i,$v:=.Chart.Prices}}{{if $i}},{{end}}{{printf "%.3f" $v}}{{end}}]
-      }]
-    },
-    options: {
-      plugins: {
-        legend: { display: true, position: 'top' },
-        tooltip: {
-          callbacks: {
-            title: (tooltipItem) => tooltipItem[0].label,
-            label: (tooltipItem) => tooltipItem.dataset.label + ': ' + tooltipItem.formattedValue.replace('.', ',') + ' €/kWh'
-          }
-        }
-      },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: function(value) {
-              return value.toLocaleString('de-DE', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' €';
-            }
-          }
-        }
-      }
-    }
-  });
+renderChart("yearChart", {{.Charts.Consumption}});
+renderChart("priceChart", {{.Charts.Price}});
 </script>
+
 {{end}}

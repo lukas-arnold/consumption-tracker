@@ -25,3 +25,9 @@ type OilFillLevel struct {
 	OilFillLevelInput
 	Percentage float64 `json:"-"`
 }
+
+type OilCharts struct {
+	Consumption ChartModel
+	Price       ChartModel
+	FillLevel   ChartModel
+}

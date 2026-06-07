@@ -13,3 +13,7 @@ th, td {
   width: 100%;
   overflow-x: auto;
 }
+
+canvas {
+  max-height: 720px;
+}

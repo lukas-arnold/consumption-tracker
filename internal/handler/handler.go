@@ -104,67 +104,96 @@ func HandleElectricityView(w http.ResponseWriter, r *http.Request) {
 	handleElectricityView(w, r)
 }
 
+type ElectricityView struct {
+	models.ConsumptionStorage
+	Charts  models.ElectricityCharts
+	Summary ConsumptionSummary
+}
+
 func handleElectricityView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("view.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/electricity/view.html", "templates/electricity/index.html"),
+		template.New("view.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(
+				configs.GetWebFiles(),
+				"templates/electricity/view.html",
+				"templates/electricity/index.html",
+			),
 	)
+
 	consumptionStorage, err := storage.GetConsumptionStorage()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
+		return
 	}
-	chart, err := storage.GetElectricityForChart()
+
+	charts, err := storage.GetElectricityCharts()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
+		return
 	}
-	summary := buildElectricitySummary(consumptionStorage)
-	view := struct {
-		models.ConsumptionStorage
-		Chart   models.ElectricityForChart
-		Summary ConsumptionSummary
-	}{consumptionStorage, chart, summary}
-	err = tmpl.Execute(w, view)
-	if err != nil {
+
+	view := ElectricityView{
+		ConsumptionStorage: consumptionStorage,
+		Charts:             charts,
+		Summary:            buildElectricitySummary(consumptionStorage),
+	}
+
+	if err := tmpl.Execute(w, view); err != nil {
 		errorHandling(w, 500)
 		log.Print(err)
 	}
 }
 
+type OilView struct {
+	models.ConsumptionStorage
+	Charts  models.OilCharts
+	Summary ConsumptionSummary
+}
+
 func HandleOilView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("view.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/oil/view.html", "templates/oil/index.html"),
+		template.New("view.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(
+				configs.GetWebFiles(),
+				"templates/oil/view.html",
+				"templates/oil/index.html",
+			),
 	)
+
 	consumptionStorage, err := storage.GetConsumptionStorage()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
+		return
 	}
+
 	fillLevels, err := storage.GetOilFillLevels()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
+		return
 	}
+
 	consumptionStorage.OilFillLevels = fillLevels
-	chart, err := storage.GetOilForChart()
+
+	charts, err := storage.GetOilCharts()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
+		return
 	}
-	fillChart, err := storage.GetOilFillLevelForChart()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+
+	view := OilView{
+		ConsumptionStorage: consumptionStorage,
+		Charts:             charts,
+		Summary:            buildOilSummary(consumptionStorage),
 	}
-	summary := buildOilSummary(consumptionStorage)
-	view := struct {
-		models.ConsumptionStorage
-		OilChart       models.OilForChart
-		FillLevelChart models.OilFillLevelForChart
-		Summary        ConsumptionSummary
-	}{consumptionStorage, chart, fillChart, summary}
-	err = tmpl.Execute(w, view)
-	if err != nil {
+
+	if err := tmpl.Execute(w, view); err != nil {
 		errorHandling(w, 500)
 		log.Print(err)
 	}
@@ -178,28 +207,44 @@ type ConsumptionSummary struct {
 	YearsCount                int
 }
 
+type WaterView struct {
+	models.ConsumptionStorage
+	Charts  models.WaterCharts
+	Summary ConsumptionSummary
+}
+
 func HandleWaterView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("view.html").Funcs(getTemplateFuncs()).ParseFS(configs.GetWebFiles(), "templates/water/view.html", "templates/water/index.html"),
+		template.New("view.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(
+				configs.GetWebFiles(),
+				"templates/water/view.html",
+				"templates/water/index.html",
+			),
 	)
+
 	consumptionStorage, err := storage.GetConsumptionStorage()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
+		return
 	}
-	chart, err := storage.GetWaterForChart()
+
+	charts, err := storage.GetWaterCharts()
 	if err != nil {
 		errorHandling(w, 404)
 		log.Print(err)
+		return
 	}
-	summary := buildWaterSummary(consumptionStorage)
-	view := struct {
-		models.ConsumptionStorage
-		Chart   models.WaterForChart
-		Summary ConsumptionSummary
-	}{consumptionStorage, chart, summary}
-	err = tmpl.Execute(w, view)
-	if err != nil {
+
+	view := WaterView{
+		ConsumptionStorage: consumptionStorage,
+		Charts:             charts,
+		Summary:            buildWaterSummary(consumptionStorage),
+	}
+
+	if err := tmpl.Execute(w, view); err != nil {
 		errorHandling(w, 500)
 		log.Print(err)
 	}
