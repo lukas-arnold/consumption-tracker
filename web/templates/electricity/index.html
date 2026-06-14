@@ -1,95 +1,88 @@
 {{define "electricity"}}
 <h2 class="center">{{T "electricity"}}</h2>
-
 <div>
-  <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
-  <canvas id="yearChart"></canvas>
+	<h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
+	<canvas id="yearChart"></canvas>
 </div>
-
 <div>
-  <h3 class="center">{{T "pricePerUnit"}}</h3>
-  <canvas id="priceChart"></canvas>
+	<h3 class="center">{{T "pricePerUnit"}}</h3>
+	<canvas id="priceChart"></canvas>
 </div>
-
 <div class="grid">
-  <article class="card">
-    <strong>{{T "totalConsumption"}}</strong>
-    <div>{{Int .Summary.TotalConsumption}} kWh</div>
-  </article>
-  <article class="card">
-    <strong>{{T "totalCosts"}}</strong>
-    <div>{{Euro .Summary.TotalCosts}}</div>
-  </article>
-  <article class="card">
-    <strong>{{T "averageConsumptionPerYear"}}</strong>
-    <div>{{Int .Summary.AverageConsumptionPerYear}} kWh</div>
-  </article>
-  <article class="card">
-    <strong>{{T "averageCostPerUnit"}}</strong>
-    <div>{{Euro .Summary.AverageCostPerUnit}} /kWh</div>
-  </article>
+	<article class="card">
+		<strong>{{T "totalConsumption"}}</strong>
+		<div>{{Int .Summary.TotalConsumption}} kWh</div>
+	</article>
+	<article class="card">
+		<strong>{{T "totalCosts"}}</strong>
+		<div>{{Euro .Summary.TotalCosts}}</div>
+	</article>
+	<article class="card">
+		<strong>{{T "averageConsumptionPerYear"}}</strong>
+		<div>{{Int .Summary.AverageConsumptionPerYear}} kWh</div>
+	</article>
+	<article class="card">
+		<strong>{{T "averageCostPerUnit"}}</strong>
+		<div>{{Euro .Summary.AverageCostPerUnit}} /kWh</div>
+	</article>
 </div>
-
-<div class="table-wrapper">
-  <table>
-    <thead>
-      <tr>
-        <th>{{T "period"}}</th>
-        <th>{{T "consumption"}}</th>
-        <th>{{T "pricePerUnit"}}</th>
-        <th>{{T "costs"}}</th>
-        <th>{{T "retailer"}}</th>
-        <th>{{T "payments"}}</th>
-        <th>{{T "monthlyPayment"}}</th>
-        <th>{{T "difference"}}</th>
-        <th>{{T "note"}}</th>
-        <th>{{T "action"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{range .Electricity}}
-      <tr>
-        <td>
-          <div class="date">{{.TimeFrom}}</div>
-          <div class="date">{{.TimeTo}}</div>
-        </td>
-        <td>{{Int .Consumption}} kWh</td>
-        <td>{{Price .Costs .Consumption "kWh"}}</td>
-        <td>{{Euro .Costs}}</td>
-        <td>{{.Retailer}}</td>
-        <td>{{Euro .Payments}}</td>
-        <td>{{Monthly .Payments}}</td>
-        <td>{{Difference .Payments .Costs}}</td>
-        <td>{{.Note}}</td>
-        <td>
-          <article>
-            <form action="/electricity/edit/{{.Id}}">
-              <button type="submit" class="secondary">
-                <i class="fa-solid fa-pen"></i>
-              </button>
-            </form>
-            <form action="/electricity/delete/{{.Id}}">
-              <button type="submit" class="contrast">
-                <i class="fa-solid fa-trash"></i>
-              </button>
-            </form>
-          </article>
-        </td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
+<div class="overflow-auto">
+	<table>
+		<thead>
+			<tr>
+				<th>{{T "period"}}</th>
+				<th>{{T "consumption"}}</th>
+				<th>{{T "pricePerUnit"}}</th>
+				<th>{{T "costs"}}</th>
+				<th>{{T "retailer"}}</th>
+				<th>{{T "payments"}}</th>
+				<th>{{T "monthlyPayment"}}</th>
+				<th>{{T "difference"}}</th>
+				<th>{{T "note"}}</th>
+				<th>{{T "action"}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{range .Electricity}}
+			<tr>
+				<td>
+					<div class="date">{{.TimeFrom}}</div>
+					<div class="date">{{.TimeTo}}</div>
+				</td>
+				<td>{{Int .Consumption}} kWh</td>
+				<td>{{Price .Costs .Consumption "kWh"}}</td>
+				<td>{{Euro .Costs}}</td>
+				<td>{{.Retailer}}</td>
+				<td>{{Euro .Payments}}</td>
+				<td>{{Monthly .Payments}}</td>
+				<td>{{Difference .Payments .Costs}}</td>
+				<td>{{.Note}}</td>
+				<td>
+					<article>
+						<form action="/electricity/edit/{{.Id}}">
+							<button type="submit" class="secondary">
+							<i class="fa-solid fa-pen"></i>
+							</button>
+						</form>
+						<form action="/electricity/delete/{{.Id}}">
+							<button type="submit" class="contrast">
+							<i class="fa-solid fa-trash"></i>
+							</button>
+						</form>
+					</article>
+				</td>
+			</tr>
+			{{end}}
+		</tbody>
+	</table>
 </div>
-
 <form action="/electricity/add">
-  <button type="submit" class="primary">
-    {{T "addElectricity"}}
-  </button>
+	<button type="submit" class="primary">
+	{{T "addElectricity"}}
+	</button>
 </form>
-
 <script>
-renderChart("yearChart", {{.Charts.Consumption}});
-renderChart("priceChart", {{.Charts.Price}});
+	renderChart("yearChart", {{.Charts.Consumption}});
+	renderChart("priceChart", {{.Charts.Price}});
 </script>
-
 {{end}}

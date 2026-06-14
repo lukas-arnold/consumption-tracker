@@ -1,98 +1,93 @@
 {{define "water"}}
 <h2 class="center">{{T "water"}}</h2>
-
-  <div>
-    <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
-    <canvas id="yearChart"></canvas>
-  </div>
-
-  <div class="chart-full">
-    <h3 class="center">{{T "pricePerUnit"}}</h3>
-    <canvas id="priceChart"></canvas>
-  </div>
-<div class="grid">
-  <article class="card">
-    <strong>{{T "totalConsumption"}}</strong>
-    <div>{{Int .Summary.TotalConsumption}} m³</div>
-  </article>
-  <article class="card">
-    <strong>{{T "totalCosts"}}</strong>
-    <div>{{Euro .Summary.TotalCosts}}</div>
-  </article>
-  <article class="card">
-    <strong>{{T "averageConsumptionPerYear"}}</strong>
-    <div>{{Int .Summary.AverageConsumptionPerYear}} m³</div>
-  </article>
-  <article class="card">
-    <strong>{{T "averageCostPerUnit"}}</strong>
-    <div>{{Euro .Summary.AverageCostPerUnit}} /m³</div>
-  </article>
+<div>
+	<h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
+	<canvas id="yearChart"></canvas>
 </div>
-
-<div class="table-wrapper">
-  <table>
-    <thead>
-      <tr>
-        <th>{{T "year"}}</th>
-        <th>{{T "volumeWater"}}</th>
-        <th>{{T "priceWater"}}</th>
-        <th>{{T "costsWater"}}</th>
-        <th>{{T "volumeWastewater"}}</th>
-        <th>{{T "priceWastewater"}}</th>
-        <th>{{T "costsWastewater"}}</th>
-        <th>{{T "volumeRainwater"}}</th>
-        <th>{{T "priceRainwater"}}</th>
-        <th>{{T "costsRainwater"}}</th>
-        <th>{{T "fixedPrice"}}</th>
-        <th>{{T "totalCosts"}}</th>
-        <th>{{T "payments"}}</th>
-        <th>{{T "monthlyPayment"}}</th>
-        <th>{{T "difference"}}</th>
-        <th>{{T "note"}}</th>
-        <th>{{T "action"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{range .Water}}
-      <tr>
-        <td>{{.Year}}</td>
-        <td>{{Int .VolumeWater}} m³</td>
-        <td>{{Price .CostsWater .VolumeWater "m³"}}</td>
-        <td>{{Euro .CostsWater}}</td>
-        <td>{{Int .VolumeWastewater}} m³</td>
-        <td>{{Price .CostsWastewater .VolumeWastewater "m³"}}</td>
-        <td>{{Euro .CostsWastewater}}</td>
-        <td>{{Int .VolumeRainwater}} m³</td>
-        <td>{{Price .CostsRainwater .VolumeRainwater "m³"}}</td>
-        <td>{{Euro .CostsRainwater}}</td>
-        <td>{{Euro .FixedPrice}}</td>
-        <td>{{TotalCosts .CostsWater .CostsWastewater .CostsRainwater .FixedPrice}}</td>
-        <td>{{Euro .Payments}}</td>
-        <td>{{Monthly .Payments}}</td>
-        <td>{{Difference .Payments (Add .CostsWater .CostsWastewater .CostsRainwater)}}</td>
-        <td>{{.Note}}</td>
-        <td>
-          <article>
-            <form action="/water/edit/{{.Id}}">
-              <button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
-            </form>
-            <form action="/water/delete/{{.Id}}">
-              <button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
-            </form>
-          </article>
-        </td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
+<div class="chart-full">
+	<h3 class="center">{{T "pricePerUnit"}}</h3>
+	<canvas id="priceChart"></canvas>
+</div>
+<div class="grid">
+	<article class="card">
+		<strong>{{T "totalConsumption"}}</strong>
+		<div>{{Int .Summary.TotalConsumption}} m³</div>
+	</article>
+	<article class="card">
+		<strong>{{T "totalCosts"}}</strong>
+		<div>{{Euro .Summary.TotalCosts}}</div>
+	</article>
+	<article class="card">
+		<strong>{{T "averageConsumptionPerYear"}}</strong>
+		<div>{{Int .Summary.AverageConsumptionPerYear}} m³</div>
+	</article>
+	<article class="card">
+		<strong>{{T "averageCostPerUnit"}}</strong>
+		<div>{{Euro .Summary.AverageCostPerUnit}} /m³</div>
+	</article>
+</div>
+<div class="overflow-auto">
+	<table>
+		<thead>
+			<tr>
+				<th>{{T "year"}}</th>
+				<th>{{T "volumeWater"}}</th>
+				<th>{{T "priceWater"}}</th>
+				<th>{{T "costsWater"}}</th>
+				<th>{{T "volumeWastewater"}}</th>
+				<th>{{T "priceWastewater"}}</th>
+				<th>{{T "costsWastewater"}}</th>
+				<th>{{T "volumeRainwater"}}</th>
+				<th>{{T "priceRainwater"}}</th>
+				<th>{{T "costsRainwater"}}</th>
+				<th>{{T "fixedPrice"}}</th>
+				<th>{{T "totalCosts"}}</th>
+				<th>{{T "payments"}}</th>
+				<th>{{T "monthlyPayment"}}</th>
+				<th>{{T "difference"}}</th>
+				<th>{{T "note"}}</th>
+				<th>{{T "action"}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{range .Water}}
+			<tr>
+				<td>{{.Year}}</td>
+				<td>{{Int .VolumeWater}} m³</td>
+				<td>{{Price .CostsWater .VolumeWater "m³"}}</td>
+				<td>{{Euro .CostsWater}}</td>
+				<td>{{Int .VolumeWastewater}} m³</td>
+				<td>{{Price .CostsWastewater .VolumeWastewater "m³"}}</td>
+				<td>{{Euro .CostsWastewater}}</td>
+				<td>{{Int .VolumeRainwater}} m³</td>
+				<td>{{Price .CostsRainwater .VolumeRainwater "m³"}}</td>
+				<td>{{Euro .CostsRainwater}}</td>
+				<td>{{Euro .FixedPrice}}</td>
+				<td>{{TotalCosts .CostsWater .CostsWastewater .CostsRainwater .FixedPrice}}</td>
+				<td>{{Euro .Payments}}</td>
+				<td>{{Monthly .Payments}}</td>
+				<td>{{Difference .Payments (Add .CostsWater .CostsWastewater .CostsRainwater)}}</td>
+				<td>{{.Note}}</td>
+				<td>
+					<article>
+						<form action="/water/edit/{{.Id}}">
+							<button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
+						</form>
+						<form action="/water/delete/{{.Id}}">
+							<button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
+						</form>
+					</article>
+				</td>
+			</tr>
+			{{end}}
+		</tbody>
+	</table>
 </div>
 <form action="/water/add">
-  <button class="primary" type="submit">{{T "addWater"}}</button>
+	<button class="primary" type="submit">{{T "addWater"}}</button>
 </form>
-
 <script>
-renderChart("yearChart", {{.Charts.Consumption}});
-renderChart("priceChart", {{.Charts.Price}});
+	renderChart("yearChart", {{.Charts.Consumption}});
+	renderChart("priceChart", {{.Charts.Price}});
 </script>
-
 {{end}}

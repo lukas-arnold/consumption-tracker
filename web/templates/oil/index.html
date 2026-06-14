@@ -1,121 +1,113 @@
 {{define "oil"}}
 <h2 class="center">{{T "oil"}}</h2>
-
 <div>
-  <h3 class="center">{{T "oilFillLevel"}}</h3>
-  <canvas id="fillChart"></canvas>
+	<h3 class="center">{{T "oilFillLevel"}}</h3>
+	<canvas id="fillChart"></canvas>
 </div>
-
 <div>
-  <h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
-  <canvas id="yearChart"></canvas>
+	<h3 class="center">{{T "consumptionCostsPerYear"}}</h3>
+	<canvas id="yearChart"></canvas>
 </div>
-
 <div>
-  <h3 class="center">{{T "pricePerUnit"}}</h3>
-  <canvas id="priceChart"></canvas>
+	<h3 class="center">{{T "pricePerUnit"}}</h3>
+	<canvas id="priceChart"></canvas>
 </div>
-
 <div class="grid">
-  <article class="card">
-    <strong>{{T "totalConsumption"}}</strong>
-    <div>{{Int .Summary.TotalConsumption}} l</div>
-  </article>
-  <article class="card">
-    <strong>{{T "totalCosts"}}</strong>
-    <div>{{Euro .Summary.TotalCosts}}</div>
-  </article>
-  <article class="card">
-    <strong>{{T "averageConsumptionPerYear"}}</strong>
-    <div>{{Int .Summary.AverageConsumptionPerYear}} l</div>
-  </article>
-  <article class="card">
-    <strong>{{T "averageCostPerUnit"}}</strong>
-    <div>{{Euro .Summary.AverageCostPerUnit}} /l</div>
-  </article>
+	<article class="card">
+		<strong>{{T "totalConsumption"}}</strong>
+		<div>{{Int .Summary.TotalConsumption}} l</div>
+	</article>
+	<article class="card">
+		<strong>{{T "totalCosts"}}</strong>
+		<div>{{Euro .Summary.TotalCosts}}</div>
+	</article>
+	<article class="card">
+		<strong>{{T "averageConsumptionPerYear"}}</strong>
+		<div>{{Int .Summary.AverageConsumptionPerYear}} l</div>
+	</article>
+	<article class="card">
+		<strong>{{T "averageCostPerUnit"}}</strong>
+		<div>{{Euro .Summary.AverageCostPerUnit}} /l</div>
+	</article>
 </div>
-
-<div class="table-wrapper">
-  <table>
-    <thead>
-      <tr>
-        <th>{{T "date"}}</th>
-        <th>{{T "volume"}}</th>
-        <th>{{T "pricePerUnit"}}</th>
-        <th>{{T "costs"}}</th>
-        <th>{{T "retailer"}}</th>
-        <th>{{T "note"}}</th>
-        <th>{{T "action"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{range .Oil}}
-      <tr>
-        <td class="date">{{.Date}}</td>
-        <td>{{Int .Volume}} l</td>
-        <td>{{Price .Costs .Volume "l"}}</td>
-        <td>{{Euro .Costs}}</td>
-        <td>{{.Retailer}}</td>
-        <td>{{.Note}}</td>
-        <td>
-          <article>
-            <form action="/oil/edit/{{.Id}}">
-              <button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
-            </form>
-            <form action="/oil/delete/{{.Id}}">
-              <button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
-            </form>
-          </article>
-        </td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
+<div class="overflow-auto">
+	<table>
+		<thead>
+			<tr>
+				<th>{{T "date"}}</th>
+				<th>{{T "volume"}}</th>
+				<th>{{T "pricePerUnit"}}</th>
+				<th>{{T "costs"}}</th>
+				<th>{{T "retailer"}}</th>
+				<th>{{T "note"}}</th>
+				<th>{{T "action"}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{range .Oil}}
+			<tr>
+				<td class="date">{{.Date}}</td>
+				<td>{{Int .Volume}} l</td>
+				<td>{{Price .Costs .Volume "l"}}</td>
+				<td>{{Euro .Costs}}</td>
+				<td>{{.Retailer}}</td>
+				<td>{{.Note}}</td>
+				<td>
+					<article>
+						<form action="/oil/edit/{{.Id}}">
+							<button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
+						</form>
+						<form action="/oil/delete/{{.Id}}">
+							<button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
+						</form>
+					</article>
+				</td>
+			</tr>
+			{{end}}
+		</tbody>
+	</table>
 </div>
 <form action="/oil/add">
-  <button type="submit" class="primary">{{T "addOil"}}</button>
+	<button type="submit" class="primary">{{T "addOil"}}</button>
 </form>
-
 <h3 class="center">{{T "oilFillLevel"}}</h3>
 <div class="table-wrapper">
-  <table>
-    <thead>
-      <tr>
-        <th>{{T "date"}}</th>
-        <th>{{T "levelCm"}}</th>
-        <th>{{T "level"}}</th>
-        <th>{{T "action"}}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{range .OilFillLevels}}
-      <tr>
-        <td class="date">{{.Date}}</td>
-        <td>{{Float .Level 1}} cm</td>
-        <td>{{Float .Percentage 2}} %</td>
-        <td>
-          <article>
-            <form action="/oil-fill-level/edit/{{.Id}}">
-              <button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
-            </form>
-            <form action="/oil-fill-level/delete/{{.Id}}">
-              <button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
-            </form>
-          </article>
-        </td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
+	<table>
+		<thead>
+			<tr>
+				<th>{{T "date"}}</th>
+				<th>{{T "levelCm"}}</th>
+				<th>{{T "level"}}</th>
+				<th>{{T "action"}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{range .OilFillLevels}}
+			<tr>
+				<td class="date">{{.Date}}</td>
+				<td>{{Float .Level 1}} cm</td>
+				<td>{{Float .Percentage 2}} %</td>
+				<td>
+					<article>
+						<form action="/oil-fill-level/edit/{{.Id}}">
+							<button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
+						</form>
+						<form action="/oil-fill-level/delete/{{.Id}}">
+							<button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
+						</form>
+					</article>
+				</td>
+			</tr>
+			{{end}}
+		</tbody>
+	</table>
 </div>
 <form action="/oil-fill-level/add">
-  <input type="submit" value='{{T "addOilFillLevel"}}'/>
+	<input type="submit" value='{{T "addOilFillLevel"}}'/>
 </form>
-
 <script>
-renderChart("fillChart", {{.Charts.FillLevel}});
-renderChart("yearChart", {{.Charts.Consumption}});
-renderChart("priceChart", {{.Charts.Price}});
+	renderChart("fillChart", {{.Charts.FillLevel}});
+	renderChart("yearChart", {{.Charts.Consumption}});
+	renderChart("priceChart", {{.Charts.Price}});
 </script>
-
 {{end}}

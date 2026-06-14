@@ -1,43 +1,38 @@
 <!DOCTYPE html>
 <html lang='{{T "language"}}'>
-
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Consumption Tracker</title>
-  <link rel="icon" type="image/x-icon" href="/web/assets/favicon.ico">
-  <link rel="stylesheet" href="/web/css/pico.min.css">
-  <script src="/web/js/dates.js" defer></script>
-</head>
-
-<body>
-  <header class="container">
-    <nav>
-      <ul>
-        <li><strong>Consumption Tracker</strong></li>
-      </ul>
-      <ul>
-        <li><a href="/electricity">{{T "electricity"}}</a></li>
-        <li><a href="/oil">{{T "oil"}}</a></li>
-        <li><a href="/water">{{T "water"}}</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <main class="container">
-    <h1>{{T "addElectricity"}}</h1>
-    <form action="/electricity/add" method="POST">
-      <input type="date" name="timeFrom" id="lastYearStart" required>
-      <input type="date" name="timeTo" id="lastYearEnd" required>
-      <input type="number" step="1" name="consumption" placeholder='{{T "consumption"}}' required>
-      <input type="number" step="0.01" name="costs" placeholder='{{T "costs"}}' required>
-      <input type="text" name="retailer" placeholder='{{T "retailer"}}' required>
-      <input type="number" step="0.01" name="payments" placeholder='{{T "payments"}}' required>
-      <textarea name="note" placeholder='{{T "note"}}'></textarea>
-      <input type="submit" value='{{T "save"}}' style="width:100%;">
-    </form>
-  </main>
-
-</body>
-
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>{{T "title"}}</title>
+		<link rel="icon" type="image/x-icon" href="/web/assets/favicon.ico">
+		<link rel="stylesheet" href="/web/css/pico.min.css">
+		<script src="/web/js/dates.js" defer></script>
+	</head>
+	<body>
+		<header class="container">
+			<nav>
+				<ul>
+					<li><strong>{{T "title"}}</strong></li>
+				</ul>
+				<ul>
+					<li><a href="/electricity">{{T "electricity"}}</a></li>
+					<li><a href="/oil">{{T "oil"}}</a></li>
+					<li><a href="/water">{{T "water"}}</a></li>
+				</ul>
+			</nav>
+		</header>
+		<main class="container">
+			<h1>{{T "addElectricity"}}</h1>
+			<form action="/electricity/add" method="POST">
+				<input type="date" name="timeFrom" id="lastYearStart" required>
+				<input type="date" name="timeTo" id="lastYearEnd" required>
+				<input type="number" step="1" name="consumption" placeholder='{{T "consumption"}}' required>
+				<input type="number" step="0.01" name="costs" placeholder='{{T "costs"}}' required>
+				<input type="text" name="retailer" placeholder='{{T "retailer"}}' required>
+				<input type="number" step="0.01" name="payments" placeholder='{{T "payments"}}' required>
+				<textarea name="note" placeholder='{{T "note"}}'></textarea>
+				<input type="submit" value='{{T "save"}}' style="width:100%;">
+			</form>
+		</main>
+	</body>
 </html>
