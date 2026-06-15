@@ -12,6 +12,49 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
 
+type ElectricityView struct {
+	Electricity []models.Electricity
+	Charts      models.ElectricityCharts
+	Summary     ConsumptionSummary
+}
+
+func HandleElectricityView(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(
+		template.New("view.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(
+				configs.GetWebFiles(),
+				"templates/electricity/view.html",
+				"templates/electricity/index.html",
+			),
+	)
+
+	electricityEntries, err := storage.GetElectricities()
+	if err != nil {
+		errorHandling(w, 404)
+		log.Print(err)
+		return
+	}
+
+	charts, err := storage.GetElectricityCharts()
+	if err != nil {
+		errorHandling(w, 404)
+		log.Print(err)
+		return
+	}
+
+	view := ElectricityView{
+		Electricity: electricityEntries,
+		Charts:      charts,
+		Summary:     buildElectricitySummary(electricityEntries),
+	}
+
+	if err := tmpl.Execute(w, view); err != nil {
+		errorHandling(w, 500)
+		log.Print(err)
+	}
+}
+
 func HandleAddElectricityGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.New("add.html").Funcs(template.FuncMap{
@@ -153,4 +196,27 @@ func HandleDeleteElectricity(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/electricity", http.StatusFound)
+}
+
+func buildElectricitySummary(electricityEntries []models.Electricity) ConsumptionSummary {
+	years := map[string]bool{}
+	totalConsumption := 0.0
+	totalCosts := 0.0
+	for _, entry := range electricityEntries {
+		if len(entry.TimeFrom) >= 4 {
+			years[entry.TimeFrom[:4]] = true
+		}
+		totalConsumption += entry.Consumption
+		totalCosts += entry.Costs
+	}
+	yearsCount := len(years)
+	averageConsumption := 0.0
+	if yearsCount > 0 {
+		averageConsumption = totalConsumption / float64(yearsCount)
+	}
+	averageCost := 0.0
+	if totalConsumption > 0 {
+		averageCost = totalCosts / totalConsumption
+	}
+	return ConsumptionSummary{TotalConsumption: totalConsumption, TotalCosts: totalCosts, AverageConsumptionPerYear: averageConsumption, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
 }

@@ -3,14 +3,11 @@ package handler
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strings"
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
 	"github.com/lukas-arnold/consumption-tracker/internal/language"
-	"github.com/lukas-arnold/consumption-tracker/internal/models"
-	"github.com/lukas-arnold/consumption-tracker/internal/storage"
 )
 
 func errorHandling(w http.ResponseWriter, httpStatusCode int) {
@@ -97,106 +94,7 @@ func HandleFiles(w http.ResponseWriter, r *http.Request) {
 }
 
 func HandleView(w http.ResponseWriter, r *http.Request) {
-	handleElectricityView(w, r)
-}
-
-func HandleElectricityView(w http.ResponseWriter, r *http.Request) {
-	handleElectricityView(w, r)
-}
-
-type ElectricityView struct {
-	models.ConsumptionStorage
-	Charts  models.ElectricityCharts
-	Summary ConsumptionSummary
-}
-
-func handleElectricityView(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("view.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(
-				configs.GetWebFiles(),
-				"templates/electricity/view.html",
-				"templates/electricity/index.html",
-			),
-	)
-
-	consumptionStorage, err := storage.GetConsumptionStorage()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-		return
-	}
-
-	charts, err := storage.GetElectricityCharts()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-		return
-	}
-
-	view := ElectricityView{
-		ConsumptionStorage: consumptionStorage,
-		Charts:             charts,
-		Summary:            buildElectricitySummary(consumptionStorage),
-	}
-
-	if err := tmpl.Execute(w, view); err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
-	}
-}
-
-type OilView struct {
-	models.ConsumptionStorage
-	Charts  models.OilCharts
-	Summary ConsumptionSummary
-}
-
-func HandleOilView(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("view.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(
-				configs.GetWebFiles(),
-				"templates/oil/view.html",
-				"templates/oil/index.html",
-			),
-	)
-
-	consumptionStorage, err := storage.GetConsumptionStorage()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-		return
-	}
-
-	fillLevels, err := storage.GetOilFillLevels()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-		return
-	}
-
-	consumptionStorage.OilFillLevels = fillLevels
-
-	charts, err := storage.GetOilCharts()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-		return
-	}
-
-	view := OilView{
-		ConsumptionStorage: consumptionStorage,
-		Charts:             charts,
-		Summary:            buildOilSummary(consumptionStorage),
-	}
-
-	if err := tmpl.Execute(w, view); err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
-	}
+	HandleElectricityView(w, r)
 }
 
 type ConsumptionSummary struct {
@@ -205,120 +103,4 @@ type ConsumptionSummary struct {
 	AverageConsumptionPerYear float64
 	AverageCostPerUnit        float64
 	YearsCount                int
-}
-
-type WaterView struct {
-	models.ConsumptionStorage
-	Charts  models.WaterCharts
-	Summary ConsumptionSummary
-}
-
-func HandleWaterView(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("view.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(
-				configs.GetWebFiles(),
-				"templates/water/view.html",
-				"templates/water/index.html",
-			),
-	)
-
-	consumptionStorage, err := storage.GetConsumptionStorage()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-		return
-	}
-
-	charts, err := storage.GetWaterCharts()
-	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
-		return
-	}
-
-	view := WaterView{
-		ConsumptionStorage: consumptionStorage,
-		Charts:             charts,
-		Summary:            buildWaterSummary(consumptionStorage),
-	}
-
-	if err := tmpl.Execute(w, view); err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
-	}
-}
-
-func buildElectricitySummary(consumptionStorage models.ConsumptionStorage) ConsumptionSummary {
-	years := map[string]bool{}
-	totalConsumption := 0.0
-	totalCosts := 0.0
-	for _, entry := range consumptionStorage.Electricity {
-		if len(entry.TimeFrom) >= 4 {
-			years[entry.TimeFrom[:4]] = true
-		}
-		totalConsumption += entry.Consumption
-		totalCosts += entry.Costs
-	}
-	yearsCount := len(years)
-	averageConsumption := 0.0
-	if yearsCount > 0 {
-		averageConsumption = totalConsumption / float64(yearsCount)
-	}
-	averageCost := 0.0
-	if totalConsumption > 0 {
-		averageCost = totalCosts / totalConsumption
-	}
-	return ConsumptionSummary{TotalConsumption: totalConsumption, TotalCosts: totalCosts, AverageConsumptionPerYear: averageConsumption, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
-}
-
-func buildOilSummary(consumptionStorage models.ConsumptionStorage) ConsumptionSummary {
-	years := map[string]bool{}
-	totalVolume := 0.0
-	totalCosts := 0.0
-	for _, entry := range consumptionStorage.Oil {
-		if len(entry.Date) >= 4 {
-			years[entry.Date[:4]] = true
-		}
-		totalVolume += entry.Volume
-		totalCosts += entry.Costs
-	}
-	yearsCount := len(years)
-	averageVolume := 0.0
-	if yearsCount > 0 {
-		averageVolume = totalVolume / float64(yearsCount)
-	}
-	averageCost := 0.0
-	if totalVolume > 0 {
-		averageCost = totalCosts / totalVolume
-	}
-	return ConsumptionSummary{TotalConsumption: totalVolume, TotalCosts: totalCosts, AverageConsumptionPerYear: averageVolume, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
-}
-
-func buildWaterSummary(consumptionStorage models.ConsumptionStorage) ConsumptionSummary {
-	years := map[string]bool{}
-	totalVolume := 0.0
-	totalCosts := 0.0
-	for _, entry := range consumptionStorage.Water {
-		years[fmt.Sprint(entry.Year)] = true
-		totalVolume += entry.VolumeWater + entry.VolumeWastewater + entry.VolumeRainwater
-		totalCosts += entry.CostsWater + entry.CostsWastewater + entry.CostsRainwater + entry.FixedPrice
-	}
-	yearsCount := len(years)
-	averageVolume := 0.0
-	if yearsCount > 0 {
-		averageVolume = totalVolume / float64(yearsCount)
-	}
-	averageCost := 0.0
-	if totalVolume > 0 {
-		averageCost = totalCosts / totalVolume
-	}
-	return ConsumptionSummary{
-		TotalConsumption:          totalVolume,
-		TotalCosts:                totalCosts,
-		AverageConsumptionPerYear: averageVolume,
-		AverageCostPerUnit:        averageCost,
-		YearsCount:                yearsCount,
-	}
 }

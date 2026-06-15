@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -11,6 +12,49 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/storage"
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
+
+type WaterView struct {
+	Water   []models.Water
+	Charts  models.WaterCharts
+	Summary ConsumptionSummary
+}
+
+func HandleWaterView(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(
+		template.New("view.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(
+				configs.GetWebFiles(),
+				"templates/water/view.html",
+				"templates/water/index.html",
+			),
+	)
+
+	waterEntries, err := storage.GetWater()
+	if err != nil {
+		errorHandling(w, 404)
+		log.Print(err)
+		return
+	}
+
+	charts, err := storage.GetWaterCharts()
+	if err != nil {
+		errorHandling(w, 404)
+		log.Print(err)
+		return
+	}
+
+	view := WaterView{
+		Water:   waterEntries,
+		Charts:  charts,
+		Summary: buildWaterSummary(waterEntries),
+	}
+
+	if err := tmpl.Execute(w, view); err != nil {
+		errorHandling(w, 500)
+		log.Print(err)
+	}
+}
 
 func HandleAddWaterGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
@@ -229,4 +273,31 @@ func HandleDeleteWater(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/water", http.StatusFound)
+}
+
+func buildWaterSummary(waterEntries []models.Water) ConsumptionSummary {
+	years := map[string]bool{}
+	totalVolume := 0.0
+	totalCosts := 0.0
+	for _, entry := range waterEntries {
+		years[fmt.Sprint(entry.Year)] = true
+		totalVolume += entry.VolumeWater + entry.VolumeWastewater + entry.VolumeRainwater
+		totalCosts += entry.CostsWater + entry.CostsWastewater + entry.CostsRainwater + entry.FixedPrice
+	}
+	yearsCount := len(years)
+	averageVolume := 0.0
+	if yearsCount > 0 {
+		averageVolume = totalVolume / float64(yearsCount)
+	}
+	averageCost := 0.0
+	if totalVolume > 0 {
+		averageCost = totalCosts / totalVolume
+	}
+	return ConsumptionSummary{
+		TotalConsumption:          totalVolume,
+		TotalCosts:                totalCosts,
+		AverageConsumptionPerYear: averageVolume,
+		AverageCostPerUnit:        averageCost,
+		YearsCount:                yearsCount,
+	}
 }

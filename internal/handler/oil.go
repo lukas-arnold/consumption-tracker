@@ -12,6 +12,58 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
 
+type OilView struct {
+	Oil          []models.Oil
+	OilFillLevel []models.OilFillLevel
+	Charts       models.OilCharts
+	Summary      ConsumptionSummary
+}
+
+func HandleOilView(w http.ResponseWriter, r *http.Request) {
+	tmpl := template.Must(
+		template.New("view.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(
+				configs.GetWebFiles(),
+				"templates/oil/view.html",
+				"templates/oil/index.html",
+			),
+	)
+
+	oilEntries, err := storage.GetOil()
+	if err != nil {
+		errorHandling(w, 404)
+		log.Print(err)
+		return
+	}
+
+	oilFillLevels, err := storage.GetOilFillLevels()
+	if err != nil {
+		errorHandling(w, 404)
+		log.Print(err)
+		return
+	}
+
+	charts, err := storage.GetOilCharts()
+	if err != nil {
+		errorHandling(w, 404)
+		log.Print(err)
+		return
+	}
+
+	view := OilView{
+		Oil:          oilEntries,
+		OilFillLevel: oilFillLevels,
+		Charts:       charts,
+		Summary:      buildOilSummary(oilEntries),
+	}
+
+	if err := tmpl.Execute(w, view); err != nil {
+		errorHandling(w, 500)
+		log.Print(err)
+	}
+}
+
 func HandleAddOilGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
 		template.New("add.html").Funcs(template.FuncMap{
@@ -244,4 +296,27 @@ func HandleDeleteOilFillLevel(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/oil", http.StatusFound)
+}
+
+func buildOilSummary(oilEntries []models.Oil) ConsumptionSummary {
+	years := map[string]bool{}
+	totalVolume := 0.0
+	totalCosts := 0.0
+	for _, entry := range oilEntries {
+		if len(entry.Date) >= 4 {
+			years[entry.Date[:4]] = true
+		}
+		totalVolume += entry.Volume
+		totalCosts += entry.Costs
+	}
+	yearsCount := len(years)
+	averageVolume := 0.0
+	if yearsCount > 0 {
+		averageVolume = totalVolume / float64(yearsCount)
+	}
+	averageCost := 0.0
+	if totalVolume > 0 {
+		averageCost = totalCosts / totalVolume
+	}
+	return ConsumptionSummary{TotalConsumption: totalVolume, TotalCosts: totalCosts, AverageConsumptionPerYear: averageVolume, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
 }

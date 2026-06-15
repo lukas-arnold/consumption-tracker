@@ -37,6 +37,18 @@ func checkStorage() {
 	}
 }
 
+func getConsumptionStorage() (models.ConsumptionStorage, error) {
+	bytes, err := readStorage()
+	if err != nil {
+		return models.ConsumptionStorage{}, err
+	}
+	storage, err := utils.ConvertBytesToConsumptionStorage(bytes)
+	if err != nil {
+		return models.ConsumptionStorage{}, err
+	}
+	return storage, nil
+}
+
 func sortStorage(storage models.ConsumptionStorage) models.ConsumptionStorage {
 	storage.Electricity = sortElectricity(storage.Electricity)
 	storage.Oil = sortOil(storage.Oil)

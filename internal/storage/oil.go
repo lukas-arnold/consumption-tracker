@@ -9,7 +9,7 @@ import (
 )
 
 func AddOil(oil models.OilInput) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func AddOil(oil models.OilInput) error {
 }
 
 func GetOil() ([]models.Oil, error) {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func GetOilEntry(id int64) (models.Oil, error) {
 }
 
 func UpdateOil(oil models.Oil) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func UpdateOil(oil models.Oil) error {
 }
 
 func DeleteOil(id int64) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func DeleteOil(id int64) error {
 }
 
 func AddOilFillLevel(oilFillLevel models.OilFillLevelInput) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func AddOilFillLevel(oilFillLevel models.OilFillLevelInput) error {
 }
 
 func GetOilFillLevels() ([]models.OilFillLevel, error) {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return nil, err
 	}
@@ -138,7 +138,7 @@ func calculateOilFillPercentage(cm float64) float64 {
 }
 
 func UpdateOilFillLevel(oilFillLevel models.OilFillLevel) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -156,7 +156,7 @@ func UpdateOilFillLevel(oilFillLevel models.OilFillLevel) error {
 }
 
 func DeleteOilFillLevel(id int64) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}

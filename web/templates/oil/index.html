@@ -71,7 +71,7 @@
 	<button type="submit" class="primary">{{T "addOil"}}</button>
 </form>
 <h3 class="center">{{T "oilFillLevel"}}</h3>
-<div class="table-wrapper">
+<div class="overflow-auto">
 	<table>
 		<thead>
 			<tr>
@@ -82,7 +82,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{{range .OilFillLevels}}
+			{{range .OilFillLevel}}
 			<tr>
 				<td class="date">{{.Date}}</td>
 				<td>{{Float .Level 1}} cm</td>

@@ -9,7 +9,7 @@ import (
 )
 
 func AddElectricity(electricity models.ElectricityInput) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func AddElectricity(electricity models.ElectricityInput) error {
 }
 
 func GetElectricities() ([]models.Electricity, error) {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func GetElectricity(id int64) (models.Electricity, error) {
 }
 
 func UpdateElectricity(electricity models.Electricity) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func UpdateElectricity(electricity models.Electricity) error {
 }
 
 func DeleteElectricity(id int64) error {
-	storage, err := GetConsumptionStorage()
+	storage, err := getConsumptionStorage()
 	if err != nil {
 		return err
 	}
