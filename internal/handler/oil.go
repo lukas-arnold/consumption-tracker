@@ -21,11 +21,11 @@ type OilView struct {
 
 func HandleOilView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("view.html").
+		template.New("base.html").
 			Funcs(getTemplateFuncs()).
 			ParseFS(
 				configs.GetWebFiles(),
-				"templates/oil/view.html",
+				"templates/base.html",
 				"templates/oil/index.html",
 			),
 	)
@@ -66,11 +66,11 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 
 func HandleAddOilGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("add.html").Funcs(template.FuncMap{
+		template.New("base.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/oil/add.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/add.html"),
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
@@ -109,11 +109,11 @@ func HandleAddOilPost(w http.ResponseWriter, r *http.Request) {
 
 func HandleEditOil(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("edit.html").Funcs(template.FuncMap{
+		template.New("base.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/oil/edit.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/edit.html"),
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
@@ -192,11 +192,11 @@ func HandleDeleteOil(w http.ResponseWriter, r *http.Request) {
 
 func HandleAddOilFillLevelGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("addFillLevel.html").Funcs(template.FuncMap{
+		template.New("base.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/oil/addFillLevel.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/addFillLevel.html"),
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
@@ -226,11 +226,11 @@ func HandleAddOilFillLevelPost(w http.ResponseWriter, r *http.Request) {
 
 func HandleEditOilFillLevel(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("editFillLevel.html").Funcs(template.FuncMap{
+		template.New("base.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/oil/editFillLevel.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/editFillLevel.html"),
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {

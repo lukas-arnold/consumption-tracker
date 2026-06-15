@@ -1,36 +1,11 @@
-<!DOCTYPE html>
-<html lang='{{T "language"}}'>
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>{{T "title"}}</title>
-		<link rel="icon" type="image/x-icon" href="/web/assets/favicon.ico">
-		<link rel="stylesheet" href="/web/css/pico.min.css">
-		<script src="/web/js/dates.js" defer></script>
-	</head>
-	<body>
-		<header class="container">
-			<nav>
-				<ul>
-					<li><strong>{{T "title"}}</strong></li>
-				</ul>
-				<ul>
-					<li><a href="/electricity">{{T "electricity"}}</a></li>
-					<li><a href="/oil">{{T "oil"}}</a></li>
-					<li><a href="/water">{{T "water"}}</a></li>
-				</ul>
-			</nav>
-		</header>
-		<main class="container">
-			<h1>{{T "addOil"}}</h1>
-			<form action="/oil/add" method="POST">
-				<input type="date" name="date" id="today" required>
-				<input type="number" step="1" name="volume" placeholder='{{T "volume"}}' required>
-				<input type="number" step="0.01" name="costs" placeholder='{{T "costs"}}' required>
-				<input type="text" name="retailer" placeholder='{{T "retailer"}}' required>
-				<textarea name="note" placeholder='{{T "note"}}'></textarea>
-				<input type="submit" value='{{T "save"}}' style="width:100%;">
-			</form>
-		</main>
-	</body>
-</html>
+{{define "template"}}
+<h1 class="center">{{T "addOil"}}</h1>
+<form action="/oil/add" method="POST">
+	<input type="date" name="date" id="today" required>
+	<input type="number" step="1" name="volume" placeholder='{{T "volume"}}' required>
+	<input type="number" step="0.01" name="costs" placeholder='{{T "costs"}}' required>
+	<input type="text" name="retailer" placeholder='{{T "retailer"}}' required>
+	<textarea name="note" placeholder='{{T "note"}}'></textarea>
+	<input type="submit" value='{{T "save"}}' style="width:100%;">
+</form>
+{{end}}

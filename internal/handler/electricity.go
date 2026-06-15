@@ -20,11 +20,11 @@ type ElectricityView struct {
 
 func HandleElectricityView(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("view.html").
+		template.New("base.html").
 			Funcs(getTemplateFuncs()).
 			ParseFS(
 				configs.GetWebFiles(),
-				"templates/electricity/view.html",
+				"templates/base.html",
 				"templates/electricity/index.html",
 			),
 	)
@@ -57,11 +57,11 @@ func HandleElectricityView(w http.ResponseWriter, r *http.Request) {
 
 func HandleAddElectricityGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("add.html").Funcs(template.FuncMap{
+		template.New("base.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/electricity/add.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/electricity/add.html"),
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
@@ -108,11 +108,11 @@ func HandleAddElectricityPost(w http.ResponseWriter, r *http.Request) {
 
 func HandleEditElectricity(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("edit.html").Funcs(template.FuncMap{
+		template.New("base.html").Funcs(template.FuncMap{
 			"T": func(key string) string {
 				return language.T(configs.GetLanguage(), key)
 			},
-		}).ParseFS(configs.GetWebFiles(), "templates/electricity/edit.html"),
+		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/electricity/edit.html"),
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {

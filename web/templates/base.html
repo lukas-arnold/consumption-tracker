@@ -13,7 +13,14 @@
 		<script src="/web/js/chart.min.js"></script>
 		<script src="/web/js/chartSettings.js"></script>
 		<script src="/web/js/format.js" defer></script>
+		<script src="/web/js/dates.js" defer></script>
 	</head>
+	<script>
+		if ("serviceWorker" in navigator) {
+		  navigator.serviceWorker.register("/service-worker")
+		    .catch(err => console.error("Service Worker failed", err));
+		}
+	</script>
 	<body>
 		<header class="container">
 			<nav>
@@ -28,7 +35,7 @@
 			</nav>
 		</header>
 		<main class="container-fluid">
-			{{template "electricity" .}}
+			{{template "template" .}}
 		</main>
 	</body>
 </html>
