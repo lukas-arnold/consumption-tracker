@@ -2,7 +2,6 @@ package handler
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
@@ -31,15 +30,13 @@ func HandleElectricityView(w http.ResponseWriter, r *http.Request) {
 
 	electricityEntries, err := storage.GetElectricities()
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
 	charts, err := storage.GetElectricityCharts()
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
@@ -50,8 +47,8 @@ func HandleElectricityView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := tmpl.Execute(w, view); err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
@@ -65,28 +62,25 @@ func HandleAddElectricityGet(w http.ResponseWriter, r *http.Request) {
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleAddElectricityPost(w http.ResponseWriter, r *http.Request) {
 	consumption, err := utils.ConvertFloat(r.FormValue("consumption"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costs, err := utils.ConvertFloat(r.FormValue("costs"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	payments, err := utils.ConvertFloat(r.FormValue("payments"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.AddElectricity(models.ElectricityInput{
@@ -99,8 +93,7 @@ func HandleAddElectricityPost(w http.ResponseWriter, r *http.Request) {
 		Note:        r.FormValue("note"),
 	})
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/electricity", http.StatusFound)
@@ -116,47 +109,41 @@ func HandleEditElectricity(w http.ResponseWriter, r *http.Request) {
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	entry, err := storage.GetElectricity(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
 	err = tmpl.Execute(w, entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleSaveElectricity(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	consumption, err := utils.ConvertFloat(r.FormValue("consumption"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costs, err := utils.ConvertFloat(r.FormValue("costs"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	payments, err := utils.ConvertFloat(r.FormValue("payments"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 
@@ -175,8 +162,7 @@ func HandleSaveElectricity(w http.ResponseWriter, r *http.Request) {
 
 	err = storage.UpdateElectricity(entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/electricity", http.StatusFound)
@@ -185,14 +171,12 @@ func HandleSaveElectricity(w http.ResponseWriter, r *http.Request) {
 func HandleDeleteElectricity(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.DeleteElectricity(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 	http.Redirect(w, r, "/electricity", http.StatusFound)

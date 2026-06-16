@@ -2,7 +2,6 @@ package handler
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
@@ -32,22 +31,19 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 
 	oilEntries, err := storage.GetOil()
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
 	oilFillLevels, err := storage.GetOilFillLevels()
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
 	charts, err := storage.GetOilCharts()
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
@@ -59,8 +55,8 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := tmpl.Execute(w, view); err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
@@ -74,22 +70,20 @@ func HandleAddOilGet(w http.ResponseWriter, r *http.Request) {
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleAddOilPost(w http.ResponseWriter, r *http.Request) {
 	volume, err := utils.ConvertFloat(r.FormValue("volume"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costs, err := utils.ConvertFloat(r.FormValue("costs"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.AddOil(models.OilInput{
@@ -100,8 +94,7 @@ func HandleAddOilPost(w http.ResponseWriter, r *http.Request) {
 		Note:     r.FormValue("note"),
 	})
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/oil", http.StatusFound)
@@ -117,40 +110,35 @@ func HandleEditOil(w http.ResponseWriter, r *http.Request) {
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	entry, err := storage.GetOilEntry(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 	err = tmpl.Execute(w, entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleSaveOil(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	volume, err := utils.ConvertFloat(r.FormValue("volume"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costs, err := utils.ConvertFloat(r.FormValue("costs"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 
@@ -167,8 +155,7 @@ func HandleSaveOil(w http.ResponseWriter, r *http.Request) {
 
 	err = storage.UpdateOil(entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/oil", http.StatusFound)
@@ -177,14 +164,12 @@ func HandleSaveOil(w http.ResponseWriter, r *http.Request) {
 func HandleDeleteOil(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.DeleteOil(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 	http.Redirect(w, r, "/oil", http.StatusFound)
@@ -200,16 +185,15 @@ func HandleAddOilFillLevelGet(w http.ResponseWriter, r *http.Request) {
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleAddOilFillLevelPost(w http.ResponseWriter, r *http.Request) {
 	level, err := utils.ConvertFloat(r.FormValue("level"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.AddOilFillLevel(models.OilFillLevelInput{
@@ -217,8 +201,7 @@ func HandleAddOilFillLevelPost(w http.ResponseWriter, r *http.Request) {
 		Level: level,
 	})
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/oil", http.StatusFound)
@@ -234,34 +217,30 @@ func HandleEditOilFillLevel(w http.ResponseWriter, r *http.Request) {
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	entry, err := storage.GetOilFillLevel(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 	err = tmpl.Execute(w, entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleSaveOilFillLevel(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	level, err := utils.ConvertFloat(r.FormValue("level"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 
@@ -275,8 +254,7 @@ func HandleSaveOilFillLevel(w http.ResponseWriter, r *http.Request) {
 
 	err = storage.UpdateOilFillLevel(entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/oil", http.StatusFound)
@@ -285,14 +263,12 @@ func HandleSaveOilFillLevel(w http.ResponseWriter, r *http.Request) {
 func HandleDeleteOilFillLevel(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.DeleteOilFillLevel(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 	http.Redirect(w, r, "/oil", http.StatusFound)

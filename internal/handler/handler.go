@@ -3,6 +3,7 @@ package handler
 import (
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strings"
 
@@ -10,8 +11,9 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/language"
 )
 
-func errorHandling(w http.ResponseWriter, httpStatusCode int) {
-	w.WriteHeader(httpStatusCode)
+func handleError(w http.ResponseWriter, err error, statusCode int) {
+	log.Printf("HTTP %d: %v", statusCode, err)
+	http.Error(w, http.StatusText(statusCode), statusCode)
 }
 
 func formatFloat(value float64, digits int) string {

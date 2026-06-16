@@ -3,7 +3,6 @@ package handler
 import (
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
@@ -32,15 +31,13 @@ func HandleWaterView(w http.ResponseWriter, r *http.Request) {
 
 	waterEntries, err := storage.GetWater()
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
 	charts, err := storage.GetWaterCharts()
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 
@@ -51,8 +48,8 @@ func HandleWaterView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := tmpl.Execute(w, view); err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
@@ -66,64 +63,55 @@ func HandleAddWaterGet(w http.ResponseWriter, r *http.Request) {
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleAddWaterPost(w http.ResponseWriter, r *http.Request) {
 	year, err := utils.ConvertInt(r.FormValue("year"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	volumeWater, err := utils.ConvertFloat(r.FormValue("volumeWater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	volumeWastewater, err := utils.ConvertFloat(r.FormValue("volumeWastewater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	volumeRainwater, err := utils.ConvertFloat(r.FormValue("volumeRainwater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costsWater, err := utils.ConvertFloat(r.FormValue("costsWater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costsWastewater, err := utils.ConvertFloat(r.FormValue("costsWastewater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costsRainwater, err := utils.ConvertFloat(r.FormValue("costsRainwater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	payments, err := utils.ConvertFloat(r.FormValue("payments"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	fixedPrice, err := utils.ConvertFloat(r.FormValue("fixedPrice"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.AddWater(models.WaterInput{
@@ -139,8 +127,7 @@ func HandleAddWaterPost(w http.ResponseWriter, r *http.Request) {
 		Note:             r.FormValue("note"),
 	})
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/water", http.StatusFound)
@@ -156,82 +143,70 @@ func HandleEditWater(w http.ResponseWriter, r *http.Request) {
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	entry, err := storage.GetWaterEntry(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 	err = tmpl.Execute(w, entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
+		return
 	}
 }
 
 func HandleSaveWater(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	year, err := utils.ConvertInt(r.FormValue("year"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	volumeWater, err := utils.ConvertFloat(r.FormValue("volumeWater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	volumeWastewater, err := utils.ConvertFloat(r.FormValue("volumeWastewater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	volumeRainwater, err := utils.ConvertFloat(r.FormValue("volumeRainwater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costsWater, err := utils.ConvertFloat(r.FormValue("costsWater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costsWastewater, err := utils.ConvertFloat(r.FormValue("costsWastewater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	costsRainwater, err := utils.ConvertFloat(r.FormValue("costsRainwater"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	payments, err := utils.ConvertFloat(r.FormValue("payments"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	fixedPrice, err := utils.ConvertFloat(r.FormValue("fixedPrice"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	entry := models.Water{
@@ -252,8 +227,7 @@ func HandleSaveWater(w http.ResponseWriter, r *http.Request) {
 
 	err = storage.UpdateWater(entry)
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	http.Redirect(w, r, "/water", http.StatusFound)
@@ -262,14 +236,12 @@ func HandleSaveWater(w http.ResponseWriter, r *http.Request) {
 func HandleDeleteWater(w http.ResponseWriter, r *http.Request) {
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
-		errorHandling(w, 500)
-		log.Print(err)
+		handleError(w, err, 500)
 		return
 	}
 	err = storage.DeleteWater(id)
 	if err != nil {
-		errorHandling(w, 404)
-		log.Print(err)
+		handleError(w, err, 404)
 		return
 	}
 	http.Redirect(w, r, "/water", http.StatusFound)
