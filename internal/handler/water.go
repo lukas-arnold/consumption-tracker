@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
-	"github.com/lukas-arnold/consumption-tracker/internal/language"
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 	"github.com/lukas-arnold/consumption-tracker/internal/storage"
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
@@ -55,11 +54,9 @@ func HandleWaterView(w http.ResponseWriter, r *http.Request) {
 
 func HandleAddWaterGet(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("base.html").Funcs(template.FuncMap{
-			"T": func(key string) string {
-				return language.T(configs.GetLanguage(), key)
-			},
-		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/water/add.html"),
+		template.New("base.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/water/add.html"),
 	)
 	err := tmpl.Execute(w, nil)
 	if err != nil {
@@ -135,11 +132,9 @@ func HandleAddWaterPost(w http.ResponseWriter, r *http.Request) {
 
 func HandleEditWater(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(
-		template.New("base.html").Funcs(template.FuncMap{
-			"T": func(key string) string {
-				return language.T(configs.GetLanguage(), key)
-			},
-		}).ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/water/edit.html"),
+		template.New("base.html").
+			Funcs(getTemplateFuncs()).
+			ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/water/edit.html"),
 	)
 	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
