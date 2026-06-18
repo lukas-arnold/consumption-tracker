@@ -2,7 +2,7 @@
 <h1 class="center">{{T "addOilFillLevel"}}</h1>
 <form action="/oil-fill-level/add" method="POST">
 	<label for="date">{{T "date"}}</label>
-	<input type="date" id="date" name="date" required>
+	<input type="date" name="date" required>
 	<label for="level">{{T "level"}} (cm)</label>
 	<input type="number" step="0.1" id="level" name="level" placeholder='{{T "level"}}' required>
 	<input type="submit" value='{{T "save"}}' style="width: 100%;" />

@@ -9,16 +9,6 @@ function isIsoDate(value) {
         /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
-function formatDate(value) {
-    const date = new Date(value);
-
-    return date.toLocaleDateString("de-DE", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit"
-    });
-}
-
 function formatValue(value, unit) {
     if (value == null) return value;
 
