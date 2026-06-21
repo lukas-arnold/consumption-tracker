@@ -9,6 +9,7 @@ import (
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
 	"github.com/lukas-arnold/consumption-tracker/internal/language"
+	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
 
 func handleError(w http.ResponseWriter, err error, statusCode int) {
@@ -40,11 +41,40 @@ func formatPrice(costs, units float64, unit string) string {
 	return formatFloat(costs/units, 3) + " €/" + unit
 }
 
-func formatMonthly(payments float64) string {
+func calculateMonthlyPeriod(payments, days float64) float64 {
+	return payments / days * 30.4375 // average days per month
+}
+
+func formatMonthly(payments float64, timeFrom, timeTo string) string {
 	if payments == 0 {
 		return "-"
 	}
-	return formatEuro(payments / 12)
+
+	// Assume the payment amount covers a full year when:
+	// - no period information is available
+	// - the dates cannot be parsed
+	// - the calculated period is invalid
+	// - the period is approximately one calendar year
+	monthly := payments / 12
+
+	if timeFrom == "" || timeTo == "" {
+		return formatEuro(monthly)
+	}
+
+	from, err1 := utils.ConvertTime(timeFrom)
+	to, err2 := utils.ConvertTime(timeTo)
+
+	if err1 != nil || err2 != nil {
+		return formatEuro(monthly)
+	}
+
+	days := to.Sub(from).Hours() / 24
+
+	if days <= 0 || (days >= 364 && days <= 366) {
+		return formatEuro(monthly)
+	}
+
+	return formatEuro(calculateMonthlyPeriod(payments, days))
 }
 
 func formatDifference(payments, costs float64) string {

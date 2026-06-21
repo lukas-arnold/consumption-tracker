@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"strconv"
+	"time"
 
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 )
@@ -46,4 +47,12 @@ func ConvertInt(iStr string) (int, error) {
 		return -1, err
 	}
 	return i, nil
+}
+
+func ConvertTime(timeStr string) (time.Time, error) {
+	t, err := time.Parse("2006-01-02", timeStr)
+	if err != nil {
+		return time.Time{}, err
+	}
+	return t, nil
 }

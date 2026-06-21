@@ -54,7 +54,7 @@
 				<td>{{Euro .Costs}}</td>
 				<td>{{.Retailer}}</td>
 				<td>{{Euro .Payments}}</td>
-				<td>{{Monthly .Payments}}</td>
+				<td>{{Monthly .Payments .TimeFrom .TimeTo}}</td>
 				<td>{{Difference .Payments .Costs}}</td>
 				<td>{{.Note}}</td>
 				<td>

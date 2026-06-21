@@ -3,15 +3,12 @@ package storage
 import (
 	"fmt"
 	"sort"
+	"time"
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
 	"github.com/lukas-arnold/consumption-tracker/internal/language"
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 )
-
-func getLanguage() string {
-	return configs.GetLanguage()
-}
 
 func GetElectricityCharts() (models.ElectricityCharts, error) {
 	electricities, err := GetElectricities()
@@ -27,26 +24,82 @@ func GetElectricityCharts() (models.ElectricityCharts, error) {
 	yearTotals := map[string]totals{}
 
 	for _, v := range electricities {
-		year := v.TimeFrom
-		if len(year) >= 4 {
-			year = year[:4]
+
+		from, err := time.Parse("2006-01-02", v.TimeFrom)
+		if err != nil {
+			return models.ElectricityCharts{}, err
 		}
 
-		t := yearTotals[year]
-		t.consumption += v.Consumption
-		t.costs += v.Costs
-		yearTotals[year] = t
+		to, err := time.Parse("2006-01-02", v.TimeTo)
+		if err != nil {
+			return models.ElectricityCharts{}, err
+		}
+
+		// Number of days in the period
+		totalDays := to.Sub(from).Hours() / 24
+		if totalDays <= 0 {
+			return models.ElectricityCharts{}, err
+		}
+
+		// Period can span several years
+		for year := from.Year(); year <= to.Year(); year++ {
+
+			yearStart := time.Date(
+				year, 1, 1,
+				0, 0, 0, 0,
+				time.Local,
+			)
+
+			yearEnd := time.Date(
+				year+1, 1, 1,
+				0, 0, 0, 0,
+				time.Local,
+			)
+
+			partStart := from
+			if partStart.Before(yearStart) {
+				partStart = yearStart
+			}
+
+			partEnd := to
+			if partEnd.After(yearEnd) {
+				partEnd = yearEnd
+			}
+
+			daysInYear := partEnd.Sub(partStart).Hours() / 24
+
+			if daysInYear <= 0 {
+				return models.ElectricityCharts{}, err
+			}
+
+			// This year's share of the period
+			ratio := daysInYear / totalDays
+
+			key := fmt.Sprintf("%d", year)
+
+			t := yearTotals[key]
+
+			t.consumption += v.Consumption * ratio
+			t.costs += v.Costs * ratio
+
+			yearTotals[key] = t
+		}
 	}
 
 	var labels []string
+
 	for y := range yearTotals {
 		labels = append(labels, y)
 	}
+
 	sort.Strings(labels)
 
-	var consumption, costs, prices []float64
+	var consumption []float64
+	var costs []float64
+	var prices []float64
 
 	for _, y := range labels {
+
 		t := yearTotals[y]
 
 		consumption = append(consumption, t.consumption)
@@ -56,6 +109,7 @@ func GetElectricityCharts() (models.ElectricityCharts, error) {
 		if t.consumption > 0 {
 			price = t.costs / t.consumption
 		}
+
 		prices = append(prices, price)
 	}
 
@@ -77,6 +131,7 @@ func GetElectricityCharts() (models.ElectricityCharts, error) {
 				},
 			},
 		},
+
 		Price: models.ChartModel{
 			Labels: labels,
 			Sets: []models.ChartDataset{

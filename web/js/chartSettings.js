@@ -4,20 +4,22 @@ Chart.defaults.interaction = {
     intersect: false
 };
 
-function isIsoDate(value) {
-    return typeof value === "string" &&
-        /^\d{4}-\d{2}-\d{2}$/.test(value);
-}
-
 function formatValue(value, unit) {
     if (value == null) return value;
 
     const num = Number(value);
 
-    if (unit === "€" || unit === "€/kWh" || unit === "€/l" || unit === "€/m³") {
+    if (unit === "€") {
         return num.toLocaleString("de-DE", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
+        }) + " " + unit;
+    }
+
+    if (unit === "€/kWh" || unit === "€/l" || unit === "€/m³") {
+        return num.toLocaleString("de-DE", {
+            minimumFractionDigits: 3,
+            maximumFractionDigits: 3
         }) + " " + unit;
     }
 
@@ -54,7 +56,13 @@ function renderChart(canvasId, model) {
             yAxes[axis] = {
                 type: "linear",
                 position: axis === "y1" ? "right" : "left",
-                beginAtZero: true,
+
+                // Fix y axis only for fillChart
+                ...(canvasId === "fillChart" && axis === "y" ? {
+                    min: 0,
+                    max: 150
+                } : {}),
+
                 grid: axis === "y1" ? { drawOnChartArea: false } : undefined,
                 ticks: {
                     callback: function(value) {
@@ -78,11 +86,9 @@ function renderChart(canvasId, model) {
                         callback: function(value) {
                             const label = this.getLabelForValue(value);
 
-                            if (isIsoDate(label)) {
-                                return formatDate(label);
-                            }
-
-                            return label;
+                            return canvasId === "fillChart"
+                                ? formatDate(label)
+                                : formatYear(label);
                         }
                     }
                 },
@@ -94,11 +100,9 @@ function renderChart(canvasId, model) {
                         title: (items) => {
                             const label = items[0].label;
 
-                            if (isIsoDate(label)) {
-                                return formatDate(label);
-                            }
-
-                            return label;
+                            return canvasId === "fillChart"
+                                ? formatDate(label)
+                                : formatYear(label);
                         },
                         label: (ctx) => {
                             const unit = model.sets[ctx.datasetIndex]?.unit || "";
