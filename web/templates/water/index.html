@@ -66,7 +66,7 @@
 				<td>{{TotalCosts .CostsWater .CostsWastewater .CostsRainwater .FixedPrice}}</td>
 				<td>{{Euro .Payments}}</td>
 				<td>{{Monthly .Payments "" ""}}</td>
-				<td>{{Difference .Payments (Add .CostsWater .CostsWastewater .CostsRainwater)}}</td>
+				<td>{{Difference .Payments (Add .CostsWater .CostsWastewater .CostsRainwater .FixedPrice)}}</td>
 				<td>{{.Note}}</td>
 				<td>
 					<article>

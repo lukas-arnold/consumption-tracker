@@ -334,8 +334,8 @@ func GetWaterCharts() (models.WaterCharts, error) {
 		}
 
 		pww := 0.0
-		if wasteVolume > 0 {
-			pww = wasteCosts / wasteVolume
+		if t.volumeWastewater > 0 {
+			pww = t.costsWastewater / t.volumeWastewater
 		}
 
 		pr := 0.0

@@ -248,7 +248,7 @@ func buildWaterSummary(waterEntries []models.Water) ConsumptionSummary {
 	totalCosts := 0.0
 	for _, entry := range waterEntries {
 		years[fmt.Sprint(entry.Year)] = true
-		totalVolume += entry.VolumeWater + entry.VolumeWastewater + entry.VolumeRainwater
+		totalVolume += entry.VolumeWater
 		totalCosts += entry.CostsWater + entry.CostsWastewater + entry.CostsRainwater + entry.FixedPrice
 	}
 	yearsCount := len(years)
