@@ -37,8 +37,8 @@
     "monthlyPayment": "Monatliche Zahlung",
     "retailer": "Lieferant",
 
-    "level": "Füllstand",
     "levelCm": "Füllstand (cm)",
+    "level%": "Füllstand (%)",
 
     "addElectricity": "Stromeintrag hinzufügen",
     "editElectricity": "Stromeintrag bearbeiten",

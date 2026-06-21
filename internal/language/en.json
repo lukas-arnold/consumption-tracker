@@ -37,8 +37,8 @@
     "monthlyPayment": "Monthly Payment",
     "retailer": "Supplier",
 
-    "level": "Level",
     "levelCm": "Level (cm)",
+    "level%": "Level (%)",
 
     "addElectricity": "Add Electricity Entry",
     "editElectricity": "Edit Electricity Entry",
