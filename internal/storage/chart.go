@@ -203,10 +203,12 @@ func GetOilCharts() (models.OilCharts, error) {
 
 	var fillDates []string
 	var fillValues []float64
+	var fillPercentages []float64
 
 	for _, v := range fillLevels {
 		fillDates = append(fillDates, v.Date)
 		fillValues = append(fillValues, v.Level)
+		fillPercentages = append(fillPercentages, v.Percentage)
 	}
 
 	return models.OilCharts{
@@ -244,6 +246,13 @@ func GetOilCharts() (models.OilCharts, error) {
 					Label: language.T(configs.GetLanguage(), "levelCm"),
 					Data:  fillValues,
 					Unit:  "cm",
+					YAxis: "y",
+				},
+				{
+					Label: language.T(configs.GetLanguage(), "level%"),
+					Data:  fillPercentages,
+					Unit:  "%",
+					YAxis: "y1",
 				},
 			},
 		},

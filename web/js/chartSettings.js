@@ -35,6 +35,12 @@ function formatValue(value, unit) {
         }) + " cm";
     }
 
+    if (unit === "%") {
+        return num.toLocaleString("de-DE", {
+            maximumFractionDigits: 2
+        }) + " %";
+    }
+
     return num;
 }
 
@@ -61,6 +67,10 @@ function renderChart(canvasId, model) {
                 ...(canvasId === "fillChart" && axis === "y" ? {
                     min: 0,
                     max: 150
+                } : {}),
+                ...(canvasId === "fillChart" && axis === "y1" ? {
+                    min: 0,
+                    max: 100
                 } : {}),
 
                 grid: axis === "y1" ? { drawOnChartArea: false } : undefined,
