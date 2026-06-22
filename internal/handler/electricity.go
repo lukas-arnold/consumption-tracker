@@ -178,24 +178,41 @@ func HandleDeleteElectricity(w http.ResponseWriter, r *http.Request) {
 }
 
 func buildElectricitySummary(electricityEntries []models.Electricity) ConsumptionSummary {
-	years := map[string]bool{}
 	totalConsumption := 0.0
 	totalCosts := 0.0
+
 	for _, entry := range electricityEntries {
-		if len(entry.TimeFrom) >= 4 {
-			years[entry.TimeFrom[:4]] = true
-		}
 		totalConsumption += entry.Consumption
 		totalCosts += entry.Costs
 	}
-	yearsCount := len(years)
+
+	yearsCount := 0
 	averageConsumption := 0.0
-	if yearsCount > 0 {
-		averageConsumption = totalConsumption / float64(yearsCount)
+
+	if len(electricityEntries) > 0 {
+		newest, err1 := utils.ConvertTime(electricityEntries[0].TimeTo)
+		oldest, err2 := utils.ConvertTime(electricityEntries[len(electricityEntries)-1].TimeFrom)
+
+		if err1 == nil && err2 == nil {
+			yearsCount = newest.Year() - oldest.Year() + 1
+
+			years := newest.Sub(oldest).Hours() / 24 / 365.25
+			if years > 0 {
+				averageConsumption = totalConsumption / years
+			}
+		}
 	}
+
 	averageCost := 0.0
 	if totalConsumption > 0 {
 		averageCost = totalCosts / totalConsumption
 	}
-	return ConsumptionSummary{TotalConsumption: totalConsumption, TotalCosts: totalCosts, AverageConsumptionPerYear: averageConsumption, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
+
+	return ConsumptionSummary{
+		TotalConsumption:          totalConsumption,
+		TotalCosts:                totalCosts,
+		AverageConsumptionPerYear: averageConsumption,
+		AverageCostPerUnit:        averageCost,
+		YearsCount:                yearsCount,
+	}
 }

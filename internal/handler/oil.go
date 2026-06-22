@@ -266,24 +266,41 @@ func HandleDeleteOilFillLevel(w http.ResponseWriter, r *http.Request) {
 }
 
 func buildOilSummary(oilEntries []models.Oil) ConsumptionSummary {
-	years := map[string]bool{}
 	totalVolume := 0.0
 	totalCosts := 0.0
+
 	for _, entry := range oilEntries {
-		if len(entry.Date) >= 4 {
-			years[entry.Date[:4]] = true
-		}
 		totalVolume += entry.Volume
 		totalCosts += entry.Costs
 	}
-	yearsCount := len(years)
+
+	yearsCount := 0
 	averageVolume := 0.0
-	if yearsCount > 0 {
-		averageVolume = totalVolume / float64(yearsCount)
+
+	if len(oilEntries) > 0 {
+		newest, err1 := utils.ConvertTime(oilEntries[0].Date)
+		oldest, err2 := utils.ConvertTime(oilEntries[len(oilEntries)-1].Date)
+
+		if err1 == nil && err2 == nil {
+			yearsCount = newest.Year() - oldest.Year() + 1
+
+			years := newest.Sub(oldest).Hours() / 24 / 365.25
+			if years > 0 {
+				averageVolume = totalVolume / years
+			}
+		}
 	}
+
 	averageCost := 0.0
 	if totalVolume > 0 {
 		averageCost = totalCosts / totalVolume
 	}
-	return ConsumptionSummary{TotalConsumption: totalVolume, TotalCosts: totalCosts, AverageConsumptionPerYear: averageVolume, AverageCostPerUnit: averageCost, YearsCount: yearsCount}
+
+	return ConsumptionSummary{
+		TotalConsumption:          totalVolume,
+		TotalCosts:                totalCosts,
+		AverageConsumptionPerYear: averageVolume,
+		AverageCostPerUnit:        averageCost,
+		YearsCount:                yearsCount,
+	}
 }

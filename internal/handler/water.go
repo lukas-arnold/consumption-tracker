@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"html/template"
 	"net/http"
 
@@ -243,23 +242,36 @@ func HandleDeleteWater(w http.ResponseWriter, r *http.Request) {
 }
 
 func buildWaterSummary(waterEntries []models.Water) ConsumptionSummary {
-	years := map[string]bool{}
 	totalVolume := 0.0
 	totalCosts := 0.0
+
 	for _, entry := range waterEntries {
-		years[fmt.Sprint(entry.Year)] = true
 		totalVolume += entry.VolumeWater
-		totalCosts += entry.CostsWater + entry.CostsWastewater + entry.CostsRainwater + entry.FixedPrice
+		totalCosts += entry.CostsWater +
+			entry.CostsWastewater +
+			entry.CostsRainwater +
+			entry.FixedPrice
 	}
-	yearsCount := len(years)
+
+	yearsCount := 0
 	averageVolume := 0.0
-	if yearsCount > 0 {
-		averageVolume = totalVolume / float64(yearsCount)
+
+	if len(waterEntries) > 0 {
+		newestYear := waterEntries[0].Year
+		oldestYear := waterEntries[len(waterEntries)-1].Year
+
+		yearsCount = newestYear - oldestYear + 1
+
+		if yearsCount > 0 {
+			averageVolume = totalVolume / float64(yearsCount)
+		}
 	}
+
 	averageCost := 0.0
 	if totalVolume > 0 {
 		averageCost = totalCosts / totalVolume
 	}
+
 	return ConsumptionSummary{
 		TotalConsumption:          totalVolume,
 		TotalCosts:                totalCosts,
