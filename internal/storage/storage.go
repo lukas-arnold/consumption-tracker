@@ -26,18 +26,11 @@ func (s *Storage) saveStorage(storage models.ConsumptionStorage) error {
 		return err
 	}
 
-	return os.WriteFile(
-		s.file,
-		[]byte(bytes),
-		0666,
-	)
+	return os.WriteFile(s.file, []byte(bytes), 0666)
 }
 
 func (s *Storage) readStorage() ([]byte, error) {
-
-	err := s.checkStorage()
-
-	if err != nil {
+	if err := s.checkStorage(); err != nil {
 		return nil, err
 	}
 
@@ -45,34 +38,20 @@ func (s *Storage) readStorage() ([]byte, error) {
 }
 
 func (s *Storage) checkStorage() error {
-
 	_, err := os.ReadFile(s.file)
-
 	if err == nil {
 		return nil
 	}
 
-	err = os.MkdirAll(
-		filepath.Dir(s.file),
-		0755,
-	)
-
-	if err != nil {
+	if err := os.MkdirAll(filepath.Dir(s.file), 0755); err != nil {
 		return err
 	}
 
-	return s.saveStorage(
-		models.ConsumptionStorage{},
-	)
+	return s.saveStorage(models.ConsumptionStorage{})
 }
 
-func (s *Storage) getConsumptionStorage() (
-	models.ConsumptionStorage,
-	error,
-) {
-
+func (s *Storage) getConsumptionStorage() (models.ConsumptionStorage, error) {
 	bytes, err := s.readStorage()
-
 	if err != nil {
 		return models.ConsumptionStorage{}, err
 	}
@@ -80,21 +59,11 @@ func (s *Storage) getConsumptionStorage() (
 	return utils.ConvertBytesToConsumptionStorage(bytes)
 }
 
-func sortStorage(
-	storage models.ConsumptionStorage,
-) models.ConsumptionStorage {
-
-	storage.Electricity =
-		sortElectricity(storage.Electricity)
-
-	storage.Oil =
-		sortOil(storage.Oil)
-
-	storage.OilFillLevels =
-		sortOilFillLevels(storage.OilFillLevels)
-
-	storage.Water =
-		sortWater(storage.Water)
+func sortStorage(storage models.ConsumptionStorage) models.ConsumptionStorage {
+	storage.Electricity = sortElectricity(storage.Electricity)
+	storage.Oil = sortOil(storage.Oil)
+	storage.OilFillLevels = sortOilFillLevels(storage.OilFillLevels)
+	storage.Water = sortWater(storage.Water)
 
 	return storage
 }

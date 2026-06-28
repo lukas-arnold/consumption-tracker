@@ -12,357 +12,146 @@ import (
 )
 
 func TestHandleWaterView(t *testing.T) {
-
 	h := testHandler(t)
 
-	req :=
-		httptest.NewRequest(
-			"GET",
-			"/water",
-			nil,
-		)
+	req := httptest.NewRequest("GET", "/water", nil)
+	rec := httptest.NewRecorder()
 
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleWaterView(
-		rec,
-		req,
-	)
+	h.HandleWaterView(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 }
 
 func TestHandleAddWaterGet(t *testing.T) {
-
 	h := testHandler(t)
 
-	req :=
-		httptest.NewRequest(
-			"GET",
-			"/water/add",
-			nil,
-		)
+	req := httptest.NewRequest("GET", "/water/add", nil)
+	rec := httptest.NewRecorder()
 
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleAddWaterGet(
-		rec,
-		req,
-	)
+	h.HandleAddWaterGet(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 }
 
 func TestHandleAddWaterPost(t *testing.T) {
-
 	h := testHandler(t)
 
 	form := url.Values{}
+	form.Set("year", "2024")
+	form.Set("volumeWater", "100")
+	form.Set("volumeWastewater", "50")
+	form.Set("volumeRainwater", "10")
+	form.Set("costsWater", "20")
+	form.Set("costsWastewater", "10")
+	form.Set("costsRainwater", "5")
+	form.Set("payments", "50")
+	form.Set("fixedPrice", "15")
 
-	form.Set(
-		"year",
-		"2024",
-	)
+	req := httptest.NewRequest("POST", "/water/add", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rec := httptest.NewRecorder()
 
-	form.Set(
-		"volumeWater",
-		"100",
-	)
-
-	form.Set(
-		"volumeWastewater",
-		"50",
-	)
-
-	form.Set(
-		"volumeRainwater",
-		"10",
-	)
-
-	form.Set(
-		"costsWater",
-		"20",
-	)
-
-	form.Set(
-		"costsWastewater",
-		"10",
-	)
-
-	form.Set(
-		"costsRainwater",
-		"5",
-	)
-
-	form.Set(
-		"payments",
-		"50",
-	)
-
-	form.Set(
-		"fixedPrice",
-		"15",
-	)
-
-	req :=
-		httptest.NewRequest(
-			"POST",
-			"/water/add",
-			strings.NewReader(
-				form.Encode(),
-			),
-		)
-
-	req.Header.Set(
-		"Content-Type",
-		"application/x-www-form-urlencoded",
-	)
-
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleAddWaterPost(
-		rec,
-		req,
-	)
+	h.HandleAddWaterPost(rec, req)
 
 	if rec.Code != http.StatusFound {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 
-	water, err :=
-		h.store.GetWater()
-
+	water, err := h.store.GetWater()
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	if len(water) != 1 {
-		t.Fatal(
-			"water missing",
-		)
+		t.Fatal("water missing")
 	}
 
 	if water[0].VolumeWater != 100 {
-		t.Fatalf(
-			"got %f",
-			water[0].VolumeWater,
-		)
+		t.Fatalf("got %f", water[0].VolumeWater)
 	}
 }
 
 func TestHandleEditWater(t *testing.T) {
-
 	h := testHandler(t)
 
-	h.store.AddWater(
-		models.WaterInput{
-			Year: 2024,
-		},
-	)
+	h.store.AddWater(models.WaterInput{Year: 2024})
+	water, _ := h.store.GetWater()
 
-	water, _ :=
-		h.store.GetWater()
+	req := httptest.NewRequest("GET", "/water/edit", nil)
+	req.SetPathValue("id", strconv.FormatInt(water[0].Id, 10))
+	rec := httptest.NewRecorder()
 
-	req :=
-		httptest.NewRequest(
-			"GET",
-			"/water/edit",
-			nil,
-		)
-
-	req.SetPathValue(
-		"id",
-		strconv.FormatInt(
-			water[0].Id,
-			10,
-		),
-	)
-
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleEditWater(
-		rec,
-		req,
-	)
+	h.HandleEditWater(rec, req)
 
 	if rec.Code != http.StatusOK {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 }
 
 func TestHandleEditWaterInvalidID(t *testing.T) {
-
 	h := testHandler(t)
 
-	req :=
-		httptest.NewRequest(
-			"GET",
-			"/water/edit",
-			nil,
-		)
+	req := httptest.NewRequest("GET", "/water/edit", nil)
+	req.SetPathValue("id", "abc")
+	rec := httptest.NewRecorder()
 
-	req.SetPathValue(
-		"id",
-		"abc",
-	)
-
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleEditWater(
-		rec,
-		req,
-	)
+	h.HandleEditWater(rec, req)
 
 	if rec.Code != http.StatusInternalServerError {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 }
 
 func TestSaveWater(t *testing.T) {
-
 	h := testHandler(t)
 
-	h.store.AddWater(
-		models.WaterInput{
-			Year:        2024,
-			VolumeWater: 100,
-			CostsWater:  200,
-		},
-	)
+	h.store.AddWater(models.WaterInput{
+		Year:        2024,
+		VolumeWater: 100,
+		CostsWater:  200,
+	})
 
-	waters, _ :=
-		h.store.GetWater()
+	waters, _ := h.store.GetWater()
 
 	form := url.Values{}
+	form.Set("year", "2025")
+	form.Set("volumeWater", "300")
+	form.Set("volumeWastewater", "250")
+	form.Set("volumeRainwater", "10")
+	form.Set("costsWater", "400")
+	form.Set("costsWastewater", "100")
+	form.Set("costsRainwater", "20")
+	form.Set("payments", "500")
+	form.Set("fixedPrice", "50")
 
-	form.Set(
-		"year",
-		"2025",
-	)
+	req := httptest.NewRequest("POST", "/water/save", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetPathValue("id", strconv.FormatInt(waters[0].Id, 10))
+	rec := httptest.NewRecorder()
 
-	form.Set(
-		"volumeWater",
-		"300",
-	)
-
-	form.Set(
-		"volumeWastewater",
-		"250",
-	)
-
-	form.Set(
-		"volumeRainwater",
-		"10",
-	)
-
-	form.Set(
-		"costsWater",
-		"400",
-	)
-
-	form.Set(
-		"costsWastewater",
-		"100",
-	)
-
-	form.Set(
-		"costsRainwater",
-		"20",
-	)
-
-	form.Set(
-		"payments",
-		"500",
-	)
-
-	form.Set(
-		"fixedPrice",
-		"50",
-	)
-
-	req :=
-		httptest.NewRequest(
-			"POST",
-			"/water/save",
-			strings.NewReader(
-				form.Encode(),
-			),
-		)
-
-	req.Header.Set(
-		"Content-Type",
-		"application/x-www-form-urlencoded",
-	)
-
-	req.SetPathValue(
-		"id",
-		strconv.FormatInt(
-			waters[0].Id,
-			10,
-		),
-	)
-
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleSaveWater(
-		rec,
-		req,
-	)
+	h.HandleSaveWater(rec, req)
 
 	if rec.Code != http.StatusFound {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 
-	updated, _ :=
-		h.store.GetWater()
-
+	updated, _ := h.store.GetWater()
 	if updated[0].Year != 2025 {
-		t.Fatal(
-			"water not updated",
-		)
+		t.Fatal("water not updated")
 	}
-
 	if updated[0].VolumeWater != 300 {
-		t.Fatal(
-			"wrong water volume",
-		)
+		t.Fatal("wrong water volume")
 	}
 }
 
 func TestSaveWaterInvalidID(t *testing.T) {
-
 	h := testHandler(t)
 
 	form := url.Values{}
-
 	form.Set("year", "2024")
 	form.Set("volumeWater", "100")
 	form.Set("volumeWastewater", "100")
@@ -373,122 +162,50 @@ func TestSaveWaterInvalidID(t *testing.T) {
 	form.Set("payments", "300")
 	form.Set("fixedPrice", "0")
 
-	req :=
-		httptest.NewRequest(
-			"POST",
-			"/water/save",
-			strings.NewReader(
-				form.Encode(),
-			),
-		)
+	req := httptest.NewRequest("POST", "/water/save", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.SetPathValue("id", "abc")
+	rec := httptest.NewRecorder()
 
-	req.Header.Set(
-		"Content-Type",
-		"application/x-www-form-urlencoded",
-	)
-
-	req.SetPathValue(
-		"id",
-		"abc",
-	)
-
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleSaveWater(
-		rec,
-		req,
-	)
+	h.HandleSaveWater(rec, req)
 
 	if rec.Code != http.StatusInternalServerError {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 }
 
 func TestHandleDeleteWater(t *testing.T) {
-
 	h := testHandler(t)
 
-	h.store.AddWater(
-		models.WaterInput{
-			Year: 2024,
-		},
-	)
+	h.store.AddWater(models.WaterInput{Year: 2024})
+	water, _ := h.store.GetWater()
 
-	water, _ :=
-		h.store.GetWater()
+	req := httptest.NewRequest("GET", "/water/delete", nil)
+	req.SetPathValue("id", strconv.FormatInt(water[0].Id, 10))
+	rec := httptest.NewRecorder()
 
-	req :=
-		httptest.NewRequest(
-			"GET",
-			"/water/delete",
-			nil,
-		)
-
-	req.SetPathValue(
-		"id",
-		strconv.FormatInt(
-			water[0].Id,
-			10,
-		),
-	)
-
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleDeleteWater(
-		rec,
-		req,
-	)
+	h.HandleDeleteWater(rec, req)
 
 	if rec.Code != http.StatusFound {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 
-	result, _ :=
-		h.store.GetWater()
-
+	result, _ := h.store.GetWater()
 	if len(result) != 0 {
-		t.Fatal(
-			"water not deleted",
-		)
+		t.Fatal("water not deleted")
 	}
 }
 
 func TestDeleteWaterInvalidID(t *testing.T) {
-
 	h := testHandler(t)
 
-	req :=
-		httptest.NewRequest(
-			"GET",
-			"/water/delete",
-			nil,
-		)
+	req := httptest.NewRequest("GET", "/water/delete", nil)
+	req.SetPathValue("id", "abc")
+	rec := httptest.NewRecorder()
 
-	req.SetPathValue(
-		"id",
-		"abc",
-	)
-
-	rec :=
-		httptest.NewRecorder()
-
-	h.HandleDeleteWater(
-		rec,
-		req,
-	)
+	h.HandleDeleteWater(rec, req)
 
 	if rec.Code != http.StatusInternalServerError {
-		t.Fatalf(
-			"got %d",
-			rec.Code,
-		)
+		t.Fatalf("got %d", rec.Code)
 	}
 }

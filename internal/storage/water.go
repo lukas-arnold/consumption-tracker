@@ -56,9 +56,7 @@ func (s *Storage) UpdateWater(water models.Water) error {
 
 	for i := range storage.Water {
 		if storage.Water[i].Id == water.Id {
-
 			storage.Water[i] = water
-
 			break
 		}
 	}
@@ -73,15 +71,8 @@ func (s *Storage) DeleteWater(id int64) error {
 	}
 
 	for i := range storage.Water {
-
 		if storage.Water[i].Id == id {
-
-			storage.Water = slices.Delete(
-				storage.Water,
-				i,
-				i+1,
-			)
-
+			storage.Water = slices.Delete(storage.Water, i, i+1)
 			break
 		}
 	}

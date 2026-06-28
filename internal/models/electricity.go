@@ -1,17 +1,17 @@
 package models
 
 type ElectricityInput struct {
-	TimeFrom    string  `json:"TimeFrom"`
-	TimeTo      string  `json:"TimeTo"`
-	Consumption float64 `json:"Consumption"`
-	Costs       float64 `json:"Costs"`
-	Retailer    string  `json:"Retailer"`
-	Payments    float64 `json:"Payments"`
-	Note        string  `json:"Note"`
+	TimeFrom    string  `json:"timeFrom"`
+	TimeTo      string  `json:"timeTo"`
+	Consumption float64 `json:"consumption"`
+	Costs       float64 `json:"costs"`
+	Retailer    string  `json:"retailer"`
+	Payments    float64 `json:"payments"`
+	Note        string  `json:"note"`
 }
 
 type Electricity struct {
-	Id int64 `json:"Id"`
+	Id int64 `json:"id"`
 	ElectricityInput
 }
 

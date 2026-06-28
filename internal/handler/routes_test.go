@@ -3,166 +3,59 @@ package handler
 import (
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"testing"
-
-	"github.com/lukas-arnold/consumption-tracker/internal/storage"
 )
 
 func TestRoutes(t *testing.T) {
-
-	store := storage.New(
-		filepath.Join(
-			t.TempDir(),
-			"test.json",
-		),
-	)
-
-	h := New(store)
-
+	h := testHandler(t)
 	mux := http.NewServeMux()
-
-	RegisterRoutes(
-		mux,
-		h,
-	)
+	RegisterRoutes(mux, h)
 
 	tests := []struct {
 		method string
 		path   string
 	}{
-		{
-			method: "GET",
-			path:   "/",
-		},
+		{"GET", "/"},
+		{"GET", "/web/"},
+		{"GET", "/service-worker.js"},
 
-		{
-			method: "GET",
-			path:   "/web",
-		},
-		{
-			method: "GET",
-			path:   "/service-worker.js",
-		},
+		{"GET", "/electricity"},
+		{"GET", "/electricity/add"},
+		{"POST", "/electricity/add"},
+		{"GET", "/electricity/edit/1"},
+		{"POST", "/electricity/save/1"},
+		{"GET", "/electricity/delete/1"},
 
-		{
-			method: "GET",
-			path:   "/electricity",
-		},
-		{
-			method: "GET",
-			path:   "/electricity/add",
-		},
-		{
-			method: "POST",
-			path:   "/electricity/add",
-		},
-		{
-			method: "GET",
-			path:   "/electricity/edit/1",
-		},
-		{
-			method: "POST",
-			path:   "/electricity/save/1",
-		},
-		{
-			method: "GET",
-			path:   "/electricity/delete/1",
-		},
+		{"GET", "/oil"},
+		{"GET", "/oil/add"},
+		{"POST", "/oil/add"},
+		{"GET", "/oil/edit/1"},
+		{"POST", "/oil/save/1"},
+		{"GET", "/oil/delete/1"},
 
-		{
-			method: "GET",
-			path:   "/oil",
-		},
-		{
-			method: "GET",
-			path:   "/oil/add",
-		},
-		{
-			method: "POST",
-			path:   "/oil/add",
-		},
-		{
-			method: "GET",
-			path:   "/oil/edit/1",
-		},
-		{
-			method: "POST",
-			path:   "/oil/save/1",
-		},
-		{
-			method: "GET",
-			path:   "/oil/delete/1",
-		},
+		{"GET", "/oil/fill-level/add"},
+		{"POST", "/oil/fill-level/add"},
+		{"GET", "/oil/fill-level/edit/1"},
+		{"POST", "/oil/fill-level/save/1"},
+		{"GET", "/oil/fill-level/delete/1"},
 
-		{
-			method: "GET",
-			path:   "/oil/fill-level/add",
-		},
-		{
-			method: "POST",
-			path:   "/oil/fill-level/add",
-		},
-		{
-			method: "GET",
-			path:   "/oil/fill-level/edit/1",
-		},
-		{
-			method: "POST",
-			path:   "/oil/fill-level/save/1",
-		},
-		{
-			method: "GET",
-			path:   "/oil/fill-level/delete/1",
-		},
-
-		{
-			method: "GET",
-			path:   "/water",
-		},
-		{
-			method: "GET",
-			path:   "/water/add",
-		},
-		{
-			method: "POST",
-			path:   "/water/add",
-		},
-		{
-			method: "GET",
-			path:   "/water/edit/1",
-		},
-		{
-			method: "POST",
-			path:   "/water/save/1",
-		},
-		{
-			method: "GET",
-			path:   "/water/delete/1",
-		},
+		{"GET", "/water"},
+		{"GET", "/water/add"},
+		{"POST", "/water/add"},
+		{"GET", "/water/edit/1"},
+		{"POST", "/water/save/1"},
+		{"GET", "/water/delete/1"},
 	}
 
-	for _, test := range tests {
+	for _, tc := range tests {
+		t.Run(tc.method+" "+tc.path, func(t *testing.T) {
+			req := httptest.NewRequest(tc.method, tc.path, nil)
+			rec := httptest.NewRecorder()
+			mux.ServeHTTP(rec, req)
 
-		req := httptest.NewRequest(
-			test.method,
-			test.path,
-			nil,
-		)
-
-		rec := httptest.NewRecorder()
-
-		mux.ServeHTTP(
-			rec,
-			req,
-		)
-
-		if rec.Code == http.StatusNotFound {
-			t.Fatalf(
-				"route missing: %s %s",
-				test.method,
-				test.path,
-			)
-		}
+			if rec.Code == http.StatusNotFound {
+				t.Errorf("route %s %s returned 404", tc.method, tc.path)
+			}
+		})
 	}
 }

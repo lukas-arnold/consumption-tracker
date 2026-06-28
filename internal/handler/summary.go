@@ -13,59 +13,34 @@ type ConsumptionSummary struct {
 	YearsCount                int
 }
 
-func buildElectricitySummary(
-	electricityEntries []models.Electricity,
-) ConsumptionSummary {
-
+func buildElectricitySummary(entries []models.Electricity) ConsumptionSummary {
 	totalConsumption := 0.0
 	totalCosts := 0.0
 
-	for _, entry := range electricityEntries {
-		totalConsumption += entry.Consumption
-		totalCosts += entry.Costs
+	for _, e := range entries {
+		totalConsumption += e.Consumption
+		totalCosts += e.Costs
 	}
 
 	yearsCount := 0
 	averageConsumption := 0.0
 
-	if len(electricityEntries) > 0 {
-
-		newest, err1 :=
-			utils.ConvertTime(
-				electricityEntries[0].TimeTo,
-			)
-
-		oldest, err2 :=
-			utils.ConvertTime(
-				electricityEntries[len(electricityEntries)-1].TimeFrom,
-			)
+	if len(entries) > 0 {
+		newest, err1 := utils.ConvertTime(entries[0].TimeTo)
+		oldest, err2 := utils.ConvertTime(entries[len(entries)-1].TimeFrom)
 
 		if err1 == nil && err2 == nil {
-
-			yearsCount =
-				newest.Year() -
-					oldest.Year() +
-					1
-
-			years :=
-				newest.Sub(oldest).
-					Hours() /
-					24 /
-					365.25
-
+			yearsCount = newest.Year() - oldest.Year() + 1
+			years := newest.Sub(oldest).Hours() / 24 / 365.25
 			if years > 0 {
-				averageConsumption =
-					totalConsumption / years
+				averageConsumption = totalConsumption / years
 			}
 		}
 	}
 
 	averageCost := 0.0
-
 	if totalConsumption > 0 {
-		averageCost =
-			totalCosts /
-				totalConsumption
+		averageCost = totalCosts / totalConsumption
 	}
 
 	return ConsumptionSummary{
@@ -77,57 +52,34 @@ func buildElectricitySummary(
 	}
 }
 
-func buildOilSummary(
-	oilEntries []models.Oil,
-) ConsumptionSummary {
-
+func buildOilSummary(entries []models.Oil) ConsumptionSummary {
 	totalVolume := 0.0
 	totalCosts := 0.0
 
-	for _, entry := range oilEntries {
-		totalVolume += entry.Volume
-		totalCosts += entry.Costs
+	for _, e := range entries {
+		totalVolume += e.Volume
+		totalCosts += e.Costs
 	}
 
 	yearsCount := 0
 	averageVolume := 0.0
 
-	if len(oilEntries) > 0 {
-		newest, err1 :=
-			utils.ConvertTime(
-				oilEntries[0].Date,
-			)
-
-		oldest, err2 :=
-			utils.ConvertTime(
-				oilEntries[len(oilEntries)-1].Date,
-			)
+	if len(entries) > 0 {
+		newest, err1 := utils.ConvertTime(entries[0].Date)
+		oldest, err2 := utils.ConvertTime(entries[len(entries)-1].Date)
 
 		if err1 == nil && err2 == nil {
-			yearsCount =
-				newest.Year() -
-					oldest.Year() +
-					1
-
-			years :=
-				newest.Sub(oldest).
-					Hours() /
-					24 /
-					365.25
-
+			yearsCount = newest.Year() - oldest.Year() + 1
+			years := newest.Sub(oldest).Hours() / 24 / 365.25
 			if years > 0 {
-				averageVolume =
-					totalVolume / years
+				averageVolume = totalVolume / years
 			}
 		}
 	}
 
 	averageCost := 0.0
-
 	if totalVolume > 0 {
-		averageCost =
-			totalCosts /
-				totalVolume
+		averageCost = totalCosts / totalVolume
 	}
 
 	return ConsumptionSummary{
@@ -139,53 +91,31 @@ func buildOilSummary(
 	}
 }
 
-func buildWaterSummary(
-	waterEntries []models.Water,
-) ConsumptionSummary {
-
+func buildWaterSummary(entries []models.Water) ConsumptionSummary {
 	totalVolume := 0.0
 	totalCosts := 0.0
 
-	for _, entry := range waterEntries {
-
-		totalVolume += entry.VolumeWater
-
-		totalCosts +=
-			entry.CostsWater +
-				entry.CostsWastewater +
-				entry.CostsRainwater +
-				entry.FixedPrice
+	for _, e := range entries {
+		totalVolume += e.VolumeWater
+		totalCosts += e.CostsWater + e.CostsWastewater + e.CostsRainwater + e.FixedPrice
 	}
 
 	yearsCount := 0
 	averageVolume := 0.0
 
-	if len(waterEntries) > 0 {
+	if len(entries) > 0 {
+		newestYear := entries[0].Year
+		oldestYear := entries[len(entries)-1].Year
 
-		newestYear :=
-			waterEntries[0].Year
-
-		oldestYear :=
-			waterEntries[len(waterEntries)-1].Year
-
-		yearsCount =
-			newestYear -
-				oldestYear +
-				1
-
+		yearsCount = newestYear - oldestYear + 1
 		if yearsCount > 0 {
-			averageVolume =
-				totalVolume /
-					float64(yearsCount)
+			averageVolume = totalVolume / float64(yearsCount)
 		}
 	}
 
 	averageCost := 0.0
-
 	if totalVolume > 0 {
-		averageCost =
-			totalCosts /
-				totalVolume
+		averageCost = totalCosts / totalVolume
 	}
 
 	return ConsumptionSummary{

@@ -11,37 +11,14 @@ import (
 )
 
 func main() {
-
-	err := language.LoadLanguages()
-
-	if err != nil {
+	if err := language.LoadLanguages(); err != nil {
 		log.Fatal(err)
 	}
 
-	store :=
-		storage.New(
-			configs.GetStorageFile(),
-		)
+	store := storage.New(configs.GetStorageFile())
+	h := handler.New(store)
+	server := createServer(h)
 
-	h :=
-		handler.New(
-			store,
-		)
-
-	server :=
-		createServer(
-			h,
-		)
-
-	log.Printf(
-		"Consumption Tracker running on %s",
-		configs.GetPort(),
-	)
-
-	log.Fatal(
-		http.ListenAndServe(
-			configs.GetPort(),
-			server,
-		),
-	)
+	log.Printf("Consumption Tracker running on %s", configs.GetPort())
+	log.Fatal(http.ListenAndServe(configs.GetPort(), server))
 }

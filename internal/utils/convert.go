@@ -9,50 +9,27 @@ import (
 )
 
 func ConvertConsumptionStorageToBytes(storage models.ConsumptionStorage) ([]byte, error) {
-	bytes, err := json.Marshal(storage)
-	if err != nil {
-		return nil, err
-	}
-	return bytes, nil
+	return json.Marshal(storage)
 }
 
 func ConvertBytesToConsumptionStorage(bytes []byte) (models.ConsumptionStorage, error) {
 	var storage models.ConsumptionStorage
 	err := json.Unmarshal(bytes, &storage)
-	if err != nil {
-		return storage, err
-	}
-	return storage, nil
+	return storage, err
 }
 
 func ConvertId(idStr string) (int64, error) {
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		return -1, err
-	}
-	return id, nil
+	return strconv.ParseInt(idStr, 10, 64)
 }
 
 func ConvertFloat(fStr string) (float64, error) {
-	f, err := strconv.ParseFloat(fStr, 64)
-	if err != nil {
-		return -1, err
-	}
-	return f, nil
+	return strconv.ParseFloat(fStr, 64)
 }
 
 func ConvertInt(iStr string) (int, error) {
-	i, err := strconv.Atoi(iStr)
-	if err != nil {
-		return -1, err
-	}
-	return i, nil
+	return strconv.Atoi(iStr)
 }
 
 func ConvertTime(timeStr string) (time.Time, error) {
-	t, err := time.Parse("2006-01-02", timeStr)
-	if err != nil {
-		return time.Time{}, err
-	}
-	return t, nil
+	return time.Parse("2006-01-02", timeStr)
 }

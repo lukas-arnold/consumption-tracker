@@ -1,29 +1,29 @@
 package models
 
 type OilInput struct {
-	Date     string  `json:"Date"`
-	Volume   float64 `json:"Volume"`
-	Costs    float64 `json:"Costs"`
-	Retailer string  `json:"Retailer"`
-	Note     string  `json:"Note"`
+	Date     string  `json:"date"`
+	Volume   float64 `json:"volume"`
+	Costs    float64 `json:"costs"`
+	Retailer string  `json:"retailer"`
+	Note     string  `json:"note"`
 }
 
 type Oil struct {
-	Id int64 `json:"Id"`
+	Id int64 `json:"id"`
 	OilInput
 }
 
 const OilTankHeightCm = 150.0
 
 type OilFillLevelInput struct {
-	Date  string  `json:"Date"`
-	Level float64 `json:"Level"`
+	Date  string  `json:"date"`
+	Level float64 `json:"level"`
 }
 
 type OilFillLevel struct {
-	Id int64 `json:"Id"`
+	Id int64 `json:"id"`
 	OilFillLevelInput
-	Percentage float64 `json:"-"`
+	Percentage float64
 }
 
 type OilCharts struct {

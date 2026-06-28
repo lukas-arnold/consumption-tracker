@@ -15,32 +15,23 @@ type ElectricityView struct {
 	Summary     ConsumptionSummary
 }
 
-func (h *Handler) HandleElectricityView(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
+// Helper to reduce repetition in template parsing
+func parseElectricityTemplate(file string) *template.Template {
+	return template.Must(template.New("base.html").
+		Funcs(getTemplateFuncs()).
+		ParseFS(configs.GetWebFiles(), "templates/base.html", file))
+}
 
-	tmpl := template.Must(
-		template.New("base.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(
-				configs.GetWebFiles(),
-				"templates/base.html",
-				"templates/electricity/index.html",
-			),
-	)
+func (h *Handler) HandleElectricityView(w http.ResponseWriter, r *http.Request) {
+	tmpl := parseElectricityTemplate("templates/electricity/index.html")
 
-	electricityEntries, err :=
-		h.store.GetElectricities()
-
+	electricityEntries, err := h.store.GetElectricities()
 	if err != nil {
 		handleError(w, err, 404)
 		return
 	}
 
-	charts, err :=
-		h.store.GetElectricityCharts()
-
+	charts, err := h.store.GetElectricityCharts()
 	if err != nil {
 		handleError(w, err, 404)
 		return
@@ -54,119 +45,64 @@ func (h *Handler) HandleElectricityView(
 
 	if err := tmpl.Execute(w, view); err != nil {
 		handleError(w, err, 500)
-		return
 	}
 }
 
-func (h *Handler) HandleAddElectricityGet(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
-
-	tmpl := template.Must(
-		template.New("base.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(
-				configs.GetWebFiles(),
-				"templates/base.html",
-				"templates/electricity/add.html",
-			),
-	)
+func (h *Handler) HandleAddElectricityGet(w http.ResponseWriter, r *http.Request) {
+	tmpl := parseElectricityTemplate("templates/electricity/add.html")
 
 	if err := tmpl.Execute(w, nil); err != nil {
 		handleError(w, err, 500)
-		return
 	}
 }
 
-func (h *Handler) HandleAddElectricityPost(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
-
-	consumption, err :=
-		utils.ConvertFloat(
-			r.FormValue("consumption"),
-		)
-
+func (h *Handler) HandleAddElectricityPost(w http.ResponseWriter, r *http.Request) {
+	consumption, err := utils.ConvertFloat(r.FormValue("consumption"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	costs, err :=
-		utils.ConvertFloat(
-			r.FormValue("costs"),
-		)
-
+	costs, err := utils.ConvertFloat(r.FormValue("costs"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	payments, err :=
-		utils.ConvertFloat(
-			r.FormValue("payments"),
-		)
-
+	payments, err := utils.ConvertFloat(r.FormValue("payments"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	err = h.store.AddElectricity(
-		models.ElectricityInput{
-			TimeFrom:    r.FormValue("timeFrom"),
-			TimeTo:      r.FormValue("timeTo"),
-			Consumption: consumption,
-			Costs:       costs,
-			Retailer:    r.FormValue("retailer"),
-			Payments:    payments,
-			Note:        r.FormValue("note"),
-		},
-	)
+	input := models.ElectricityInput{
+		TimeFrom:    r.FormValue("timeFrom"),
+		TimeTo:      r.FormValue("timeTo"),
+		Consumption: consumption,
+		Costs:       costs,
+		Retailer:    r.FormValue("retailer"),
+		Payments:    payments,
+		Note:        r.FormValue("note"),
+	}
 
-	if err != nil {
+	if err := h.store.AddElectricity(input); err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	http.Redirect(
-		w,
-		r,
-		"/electricity",
-		http.StatusFound,
-	)
+	http.Redirect(w, r, "/electricity", http.StatusFound)
 }
 
-func (h *Handler) HandleEditElectricity(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
+func (h *Handler) HandleEditElectricity(w http.ResponseWriter, r *http.Request) {
+	tmpl := parseElectricityTemplate("templates/electricity/edit.html")
 
-	tmpl := template.Must(
-		template.New("base.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(
-				configs.GetWebFiles(),
-				"templates/base.html",
-				"templates/electricity/edit.html",
-			),
-	)
-
-	id, err :=
-		utils.ConvertId(
-			r.PathValue("id"),
-		)
-
+	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	entry, err :=
-		h.store.GetElectricity(id)
-
+	entry, err := h.store.GetElectricity(id)
 	if err != nil {
 		handleError(w, err, 404)
 		return
@@ -174,50 +110,29 @@ func (h *Handler) HandleEditElectricity(
 
 	if err := tmpl.Execute(w, entry); err != nil {
 		handleError(w, err, 500)
-		return
 	}
 }
 
-func (h *Handler) HandleSaveElectricity(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
-
-	id, err :=
-		utils.ConvertId(
-			r.PathValue("id"),
-		)
-
+func (h *Handler) HandleSaveElectricity(w http.ResponseWriter, r *http.Request) {
+	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	consumption, err :=
-		utils.ConvertFloat(
-			r.FormValue("consumption"),
-		)
-
+	consumption, err := utils.ConvertFloat(r.FormValue("consumption"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	costs, err :=
-		utils.ConvertFloat(
-			r.FormValue("costs"),
-		)
-
+	costs, err := utils.ConvertFloat(r.FormValue("costs"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	payments, err :=
-		utils.ConvertFloat(
-			r.FormValue("payments"),
-		)
-
+	payments, err := utils.ConvertFloat(r.FormValue("payments"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
@@ -225,7 +140,6 @@ func (h *Handler) HandleSaveElectricity(
 
 	entry := models.Electricity{
 		Id: id,
-
 		ElectricityInput: models.ElectricityInput{
 			TimeFrom:    r.FormValue("timeFrom"),
 			TimeTo:      r.FormValue("timeTo"),
@@ -237,47 +151,25 @@ func (h *Handler) HandleSaveElectricity(
 		},
 	}
 
-	err = h.store.UpdateElectricity(entry)
-
-	if err != nil {
+	if err := h.store.UpdateElectricity(entry); err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	http.Redirect(
-		w,
-		r,
-		"/electricity",
-		http.StatusFound,
-	)
+	http.Redirect(w, r, "/electricity", http.StatusFound)
 }
 
-func (h *Handler) HandleDeleteElectricity(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
-
-	id, err :=
-		utils.ConvertId(
-			r.PathValue("id"),
-		)
-
+func (h *Handler) HandleDeleteElectricity(w http.ResponseWriter, r *http.Request) {
+	id, err := utils.ConvertId(r.PathValue("id"))
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
 
-	err = h.store.DeleteElectricity(id)
-
-	if err != nil {
+	if err := h.store.DeleteElectricity(id); err != nil {
 		handleError(w, err, 404)
 		return
 	}
 
-	http.Redirect(
-		w,
-		r,
-		"/electricity",
-		http.StatusFound,
-	)
+	http.Redirect(w, r, "/electricity", http.StatusFound)
 }

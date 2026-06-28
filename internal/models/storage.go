@@ -1,10 +1,10 @@
 package models
 
 type ConsumptionStorage struct {
-	Electricity   []Electricity  `json:"Electricity"`
-	Oil           []Oil          `json:"Oil"`
-	OilFillLevels []OilFillLevel `json:"OilFillLevels"`
-	Water         []Water        `json:"Water"`
+	Electricity   []Electricity  `json:"electricity"`
+	Oil           []Oil          `json:"oil"`
+	OilFillLevels []OilFillLevel `json:"oilFillLevels"`
+	Water         []Water        `json:"water"`
 }
 
 type ChartDataset struct {

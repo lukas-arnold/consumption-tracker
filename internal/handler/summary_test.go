@@ -7,7 +7,6 @@ import (
 )
 
 func TestBuildElectricitySummary(t *testing.T) {
-
 	entries := []models.Electricity{
 		{
 			ElectricityInput: models.ElectricityInput{
@@ -27,42 +26,23 @@ func TestBuildElectricitySummary(t *testing.T) {
 		},
 	}
 
-	result :=
-		buildElectricitySummary(
-			entries,
-		)
+	result := buildElectricitySummary(entries)
 
 	if result.TotalConsumption != 3000 {
-		t.Fatalf(
-			"got %f",
-			result.TotalConsumption,
-		)
+		t.Fatalf("got %f", result.TotalConsumption)
 	}
-
 	if result.TotalCosts != 1000 {
-		t.Fatalf(
-			"got %f",
-			result.TotalCosts,
-		)
+		t.Fatalf("got %f", result.TotalCosts)
 	}
-
 	if result.AverageCostPerUnit != 1000.0/3000.0 {
-		t.Fatalf(
-			"got %f",
-			result.AverageCostPerUnit,
-		)
+		t.Fatalf("got %f", result.AverageCostPerUnit)
 	}
-
 	if result.YearsCount != 3 {
-		t.Fatalf(
-			"got %d",
-			result.YearsCount,
-		)
+		t.Fatalf("got %d", result.YearsCount)
 	}
 }
 
 func TestBuildOilSummary(t *testing.T) {
-
 	entries := []models.Oil{
 		{
 			OilInput: models.OilInput{
@@ -80,42 +60,23 @@ func TestBuildOilSummary(t *testing.T) {
 		},
 	}
 
-	result :=
-		buildOilSummary(
-			entries,
-		)
+	result := buildOilSummary(entries)
 
 	if result.TotalConsumption != 400 {
-		t.Fatalf(
-			"got %f",
-			result.TotalConsumption,
-		)
+		t.Fatalf("got %f", result.TotalConsumption)
 	}
-
 	if result.TotalCosts != 800 {
-		t.Fatalf(
-			"got %f",
-			result.TotalCosts,
-		)
+		t.Fatalf("got %f", result.TotalCosts)
 	}
-
 	if result.AverageCostPerUnit != 2 {
-		t.Fatalf(
-			"got %f",
-			result.AverageCostPerUnit,
-		)
+		t.Fatalf("got %f", result.AverageCostPerUnit)
 	}
-
 	if result.YearsCount != 2 {
-		t.Fatalf(
-			"got %d",
-			result.YearsCount,
-		)
+		t.Fatalf("got %d", result.YearsCount)
 	}
 }
 
 func TestBuildWaterSummary(t *testing.T) {
-
 	entries := []models.Water{
 		{
 			WaterInput: models.WaterInput{
@@ -139,49 +100,26 @@ func TestBuildWaterSummary(t *testing.T) {
 		},
 	}
 
-	result :=
-		buildWaterSummary(
-			entries,
-		)
+	result := buildWaterSummary(entries)
 
 	if result.TotalConsumption != 300 {
-		t.Fatalf(
-			"got %f",
-			result.TotalConsumption,
-		)
+		t.Fatalf("got %f", result.TotalConsumption)
 	}
-
 	if result.TotalCosts != 255 {
-		t.Fatalf(
-			"got %f",
-			result.TotalCosts,
-		)
+		t.Fatalf("got %f", result.TotalCosts)
 	}
-
 	if result.AverageCostPerUnit != 0.85 {
-		t.Fatalf(
-			"got %f",
-			result.AverageCostPerUnit,
-		)
+		t.Fatalf("got %f", result.AverageCostPerUnit)
 	}
-
 	if result.YearsCount != 2 {
-		t.Fatalf(
-			"got %d",
-			result.YearsCount,
-		)
+		t.Fatalf("got %d", result.YearsCount)
 	}
-
 	if result.AverageConsumptionPerYear != 150 {
-		t.Fatalf(
-			"got %f",
-			result.AverageConsumptionPerYear,
-		)
+		t.Fatalf("got %f", result.AverageConsumptionPerYear)
 	}
 }
 
 func TestBuildSummaryEmpty(t *testing.T) {
-
 	tests := []ConsumptionSummary{
 		buildElectricitySummary(nil),
 		buildOilSummary(nil),
@@ -189,23 +127,14 @@ func TestBuildSummaryEmpty(t *testing.T) {
 	}
 
 	for _, result := range tests {
-
 		if result.TotalConsumption != 0 {
-			t.Fatal(
-				"expected empty consumption",
-			)
+			t.Fatal("expected empty consumption")
 		}
-
 		if result.TotalCosts != 0 {
-			t.Fatal(
-				"expected empty costs",
-			)
+			t.Fatal("expected empty costs")
 		}
-
 		if result.YearsCount != 0 {
-			t.Fatal(
-				"expected empty years",
-			)
+			t.Fatal("expected empty years")
 		}
 	}
 }
