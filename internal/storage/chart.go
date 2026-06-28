@@ -32,8 +32,8 @@ func (s *Storage) GetElectricityCharts() (models.ElectricityCharts, error) {
 		}
 
 		for year := from.Year(); year <= to.Year(); year++ {
-			yStart := time.Date(year, 1, 1, 0, 0, 0, 0, time.Local)
-			yEnd := time.Date(year+1, 1, 1, 0, 0, 0, 0, time.Local)
+			yStart := time.Date(year, 1, 1, 0, 0, 0, 0, time.UTC)
+			yEnd := time.Date(year+1, 1, 1, 0, 0, 0, 0, time.UTC)
 
 			pStart := from
 			if yStart.After(pStart) {
@@ -85,7 +85,6 @@ func (s *Storage) GetElectricityCharts() (models.ElectricityCharts, error) {
 	}, nil
 }
 
-// GetOilCharts aggregates oil consumption and fill levels.
 func (s *Storage) GetOilCharts() (models.OilCharts, error) {
 	oils, err := s.GetOil()
 	if err != nil {

@@ -45,8 +45,8 @@ func TestGetElectricityChartsMultiYear(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if len(charts.Consumption.Labels) != 2 || charts.Consumption.Labels[0] != "2024" {
-		t.Fatal("expected split years starting 2024")
+	if len(charts.Consumption.Labels) != 1 || charts.Consumption.Labels[0] != "2024" {
+		t.Fatalf("expected only 2024, got %#v", charts.Consumption.Labels)
 	}
 }
 
