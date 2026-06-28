@@ -32,7 +32,7 @@ No external dependencies are required.
 
 ### Mobile
 
-<img src="./web/assets/mobile.png" width="400" alt="Consumption Tracker Mobile">
+<img src="./web/assets/mobile.jpg" width="400" alt="Consumption Tracker Mobile">
 
 ---
 
