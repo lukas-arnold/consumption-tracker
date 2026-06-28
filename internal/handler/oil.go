@@ -6,7 +6,6 @@ import (
 
 	"github.com/lukas-arnold/consumption-tracker/internal/configs"
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
-	"github.com/lukas-arnold/consumption-tracker/internal/storage"
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
 
@@ -17,7 +16,10 @@ type OilView struct {
 	Summary      ConsumptionSummary
 }
 
-func HandleOilView(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) HandleOilView(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
 	tmpl := template.Must(
 		template.New("base.html").
 			Funcs(getTemplateFuncs()).
@@ -28,19 +30,25 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 			),
 	)
 
-	oilEntries, err := storage.GetOil()
+	oilEntries, err :=
+		h.store.GetOil()
+
 	if err != nil {
 		handleError(w, err, 404)
 		return
 	}
 
-	oilFillLevels, err := storage.GetOilFillLevels()
+	fillLevels, err :=
+		h.store.GetOilFillLevels()
+
 	if err != nil {
 		handleError(w, err, 404)
 		return
 	}
 
-	charts, err := storage.GetOilCharts()
+	charts, err :=
+		h.store.GetOilCharts()
+
 	if err != nil {
 		handleError(w, err, 404)
 		return
@@ -48,7 +56,7 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 
 	view := OilView{
 		Oil:          oilEntries,
-		OilFillLevel: oilFillLevels,
+		OilFillLevel: fillLevels,
 		Charts:       charts,
 		Summary:      buildOilSummary(oilEntries),
 	}
@@ -59,79 +67,122 @@ func HandleOilView(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HandleAddOilGet(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("base.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/add.html"),
+func (h *Handler) HandleAddOilGet(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	h.renderTemplate(
+		w,
+		"templates/oil/add.html",
+		nil,
 	)
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		handleError(w, err, 500)
-		return
-	}
 }
 
-func HandleAddOilPost(w http.ResponseWriter, r *http.Request) {
-	volume, err := utils.ConvertFloat(r.FormValue("volume"))
+func (h *Handler) HandleAddOilPost(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	volume, err :=
+		utils.ConvertFloat(
+			r.FormValue("volume"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	costs, err := utils.ConvertFloat(r.FormValue("costs"))
+
+	costs, err :=
+		utils.ConvertFloat(
+			r.FormValue("costs"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	err = storage.AddOil(models.OilInput{
-		Date:     r.FormValue("date"),
-		Volume:   volume,
-		Costs:    costs,
-		Retailer: r.FormValue("retailer"),
-		Note:     r.FormValue("note"),
-	})
+
+	err = h.store.AddOil(
+		models.OilInput{
+			Date:     r.FormValue("date"),
+			Volume:   volume,
+			Costs:    costs,
+			Retailer: r.FormValue("retailer"),
+			Note:     r.FormValue("note"),
+		},
+	)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	http.Redirect(w, r, "/oil", http.StatusFound)
+
+	http.Redirect(
+		w,
+		r,
+		"/oil",
+		http.StatusFound,
+	)
 }
 
-func HandleEditOil(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("base.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/edit.html"),
-	)
-	id, err := utils.ConvertId(r.PathValue("id"))
+func (h *Handler) HandleEditOil(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	id, err :=
+		utils.ConvertId(
+			r.PathValue("id"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	entry, err := storage.GetOilEntry(id)
+
+	entry, err :=
+		h.store.GetOilEntry(id)
+
 	if err != nil {
 		handleError(w, err, 404)
 		return
 	}
-	err = tmpl.Execute(w, entry)
-	if err != nil {
-		handleError(w, err, 500)
-		return
-	}
+
+	h.renderTemplate(
+		w,
+		"templates/oil/edit.html",
+		entry,
+	)
 }
 
-func HandleSaveOil(w http.ResponseWriter, r *http.Request) {
-	id, err := utils.ConvertId(r.PathValue("id"))
+func (h *Handler) HandleSaveOil(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	id, err :=
+		utils.ConvertId(
+			r.PathValue("id"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	volume, err := utils.ConvertFloat(r.FormValue("volume"))
+
+	volume, err :=
+		utils.ConvertFloat(
+			r.FormValue("volume"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	costs, err := utils.ConvertFloat(r.FormValue("costs"))
+
+	costs, err :=
+		utils.ConvertFloat(
+			r.FormValue("costs"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
@@ -148,88 +199,143 @@ func HandleSaveOil(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	err = storage.UpdateOil(entry)
+	err = h.store.UpdateOil(entry)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	http.Redirect(w, r, "/oil", http.StatusFound)
+
+	http.Redirect(
+		w,
+		r,
+		"/oil",
+		http.StatusFound,
+	)
 }
 
-func HandleDeleteOil(w http.ResponseWriter, r *http.Request) {
-	id, err := utils.ConvertId(r.PathValue("id"))
+func (h *Handler) HandleDeleteOil(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	id, err :=
+		utils.ConvertId(
+			r.PathValue("id"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	err = storage.DeleteOil(id)
+
+	err = h.store.DeleteOil(id)
+
 	if err != nil {
 		handleError(w, err, 404)
 		return
 	}
-	http.Redirect(w, r, "/oil", http.StatusFound)
-}
 
-func HandleAddOilFillLevelGet(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("base.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/addFillLevel.html"),
+	http.Redirect(
+		w,
+		r,
+		"/oil",
+		http.StatusFound,
 	)
-	err := tmpl.Execute(w, nil)
-	if err != nil {
-		handleError(w, err, 500)
-		return
-	}
 }
 
-func HandleAddOilFillLevelPost(w http.ResponseWriter, r *http.Request) {
-	level, err := utils.ConvertFloat(r.FormValue("level"))
-	if err != nil {
-		handleError(w, err, 500)
-		return
-	}
-	err = storage.AddOilFillLevel(models.OilFillLevelInput{
-		Date:  r.FormValue("date"),
-		Level: level,
-	})
-	if err != nil {
-		handleError(w, err, 500)
-		return
-	}
-	http.Redirect(w, r, "/oil", http.StatusFound)
-}
-
-func HandleEditOilFillLevel(w http.ResponseWriter, r *http.Request) {
-	tmpl := template.Must(
-		template.New("base.html").
-			Funcs(getTemplateFuncs()).
-			ParseFS(configs.GetWebFiles(), "templates/base.html", "templates/oil/editFillLevel.html"),
+func (h *Handler) HandleAddOilFillLevelGet(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	h.renderTemplate(
+		w,
+		"templates/oil/addFillLevel.html",
+		nil,
 	)
-	id, err := utils.ConvertId(r.PathValue("id"))
+}
+
+func (h *Handler) HandleAddOilFillLevelPost(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	level, err :=
+		utils.ConvertFloat(
+			r.FormValue("level"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	entry, err := storage.GetOilFillLevel(id)
+
+	err = h.store.AddOilFillLevel(
+		models.OilFillLevelInput{
+			Date:  r.FormValue("date"),
+			Level: level,
+		},
+	)
+
+	if err != nil {
+		handleError(w, err, 500)
+		return
+	}
+
+	http.Redirect(
+		w,
+		r,
+		"/oil",
+		http.StatusFound,
+	)
+}
+
+func (h *Handler) HandleEditOilFillLevel(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	id, err :=
+		utils.ConvertId(
+			r.PathValue("id"),
+		)
+
+	if err != nil {
+		handleError(w, err, 500)
+		return
+	}
+
+	entry, err :=
+		h.store.GetOilFillLevel(id)
+
 	if err != nil {
 		handleError(w, err, 404)
 		return
 	}
-	err = tmpl.Execute(w, entry)
-	if err != nil {
-		handleError(w, err, 500)
-		return
-	}
+
+	h.renderTemplate(
+		w,
+		"templates/oil/editFillLevel.html",
+		entry,
+	)
 }
 
-func HandleSaveOilFillLevel(w http.ResponseWriter, r *http.Request) {
-	id, err := utils.ConvertId(r.PathValue("id"))
+func (h *Handler) HandleSaveOilFillLevel(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	id, err :=
+		utils.ConvertId(
+			r.PathValue("id"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	level, err := utils.ConvertFloat(r.FormValue("level"))
+
+	level, err :=
+		utils.ConvertFloat(
+			r.FormValue("level"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
@@ -243,64 +349,48 @@ func HandleSaveOilFillLevel(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	err = storage.UpdateOilFillLevel(entry)
+	err =
+		h.store.UpdateOilFillLevel(entry)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	http.Redirect(w, r, "/oil", http.StatusFound)
+
+	http.Redirect(
+		w,
+		r,
+		"/oil",
+		http.StatusFound,
+	)
 }
 
-func HandleDeleteOilFillLevel(w http.ResponseWriter, r *http.Request) {
-	id, err := utils.ConvertId(r.PathValue("id"))
+func (h *Handler) HandleDeleteOilFillLevel(
+	w http.ResponseWriter,
+	r *http.Request,
+) {
+	id, err :=
+		utils.ConvertId(
+			r.PathValue("id"),
+		)
+
 	if err != nil {
 		handleError(w, err, 500)
 		return
 	}
-	err = storage.DeleteOilFillLevel(id)
+
+	err =
+		h.store.DeleteOilFillLevel(id)
+
 	if err != nil {
 		handleError(w, err, 404)
 		return
 	}
-	http.Redirect(w, r, "/oil", http.StatusFound)
-}
 
-func buildOilSummary(oilEntries []models.Oil) ConsumptionSummary {
-	totalVolume := 0.0
-	totalCosts := 0.0
-
-	for _, entry := range oilEntries {
-		totalVolume += entry.Volume
-		totalCosts += entry.Costs
-	}
-
-	yearsCount := 0
-	averageVolume := 0.0
-
-	if len(oilEntries) > 0 {
-		newest, err1 := utils.ConvertTime(oilEntries[0].Date)
-		oldest, err2 := utils.ConvertTime(oilEntries[len(oilEntries)-1].Date)
-
-		if err1 == nil && err2 == nil {
-			yearsCount = newest.Year() - oldest.Year() + 1
-
-			years := newest.Sub(oldest).Hours() / 24 / 365.25
-			if years > 0 {
-				averageVolume = totalVolume / years
-			}
-		}
-	}
-
-	averageCost := 0.0
-	if totalVolume > 0 {
-		averageCost = totalCosts / totalVolume
-	}
-
-	return ConsumptionSummary{
-		TotalConsumption:          totalVolume,
-		TotalCosts:                totalCosts,
-		AverageConsumptionPerYear: averageVolume,
-		AverageCostPerUnit:        averageCost,
-		YearsCount:                yearsCount,
-	}
+	http.Redirect(
+		w,
+		r,
+		"/oil",
+		http.StatusFound,
+	)
 }

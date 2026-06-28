@@ -4,57 +4,97 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/lukas-arnold/consumption-tracker/internal/configs"
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 	"github.com/lukas-arnold/consumption-tracker/internal/utils"
 )
 
-func saveStorage(storage models.ConsumptionStorage) error {
+type Storage struct {
+	file string
+}
+
+func New(file string) *Storage {
+	return &Storage{
+		file: file,
+	}
+}
+
+func (s *Storage) saveStorage(storage models.ConsumptionStorage) error {
 	storage = sortStorage(storage)
+
 	bytes, err := utils.ConvertConsumptionStorageToBytes(storage)
 	if err != nil {
 		return err
 	}
-	err = os.WriteFile(configs.GetStorageFile(), []byte(bytes), 0666)
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return os.WriteFile(
+		s.file,
+		[]byte(bytes),
+		0666,
+	)
 }
 
-func readStorage() ([]byte, error) {
-	checkStorage()
-	bytes, err := os.ReadFile(configs.GetStorageFile())
+func (s *Storage) readStorage() ([]byte, error) {
+
+	err := s.checkStorage()
+
 	if err != nil {
 		return nil, err
 	}
-	return bytes, nil
+
+	return os.ReadFile(s.file)
 }
 
-func checkStorage() {
-	_, err := os.ReadFile(configs.GetStorageFile())
-	if err != nil {
-		os.MkdirAll(filepath.Dir(configs.GetStorageFile()), 0755)
-		saveStorage(models.ConsumptionStorage{})
+func (s *Storage) checkStorage() error {
+
+	_, err := os.ReadFile(s.file)
+
+	if err == nil {
+		return nil
 	}
+
+	err = os.MkdirAll(
+		filepath.Dir(s.file),
+		0755,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return s.saveStorage(
+		models.ConsumptionStorage{},
+	)
 }
 
-func getConsumptionStorage() (models.ConsumptionStorage, error) {
-	bytes, err := readStorage()
+func (s *Storage) getConsumptionStorage() (
+	models.ConsumptionStorage,
+	error,
+) {
+
+	bytes, err := s.readStorage()
+
 	if err != nil {
 		return models.ConsumptionStorage{}, err
 	}
-	storage, err := utils.ConvertBytesToConsumptionStorage(bytes)
-	if err != nil {
-		return models.ConsumptionStorage{}, err
-	}
-	return storage, nil
+
+	return utils.ConvertBytesToConsumptionStorage(bytes)
 }
 
-func sortStorage(storage models.ConsumptionStorage) models.ConsumptionStorage {
-	storage.Electricity = sortElectricity(storage.Electricity)
-	storage.Oil = sortOil(storage.Oil)
-	storage.OilFillLevels = sortOilFillLevels(storage.OilFillLevels)
-	storage.Water = sortWater(storage.Water)
+func sortStorage(
+	storage models.ConsumptionStorage,
+) models.ConsumptionStorage {
+
+	storage.Electricity =
+		sortElectricity(storage.Electricity)
+
+	storage.Oil =
+		sortOil(storage.Oil)
+
+	storage.OilFillLevels =
+		sortOilFillLevels(storage.OilFillLevels)
+
+	storage.Water =
+		sortWater(storage.Water)
+
 	return storage
 }

@@ -10,8 +10,8 @@ import (
 	"github.com/lukas-arnold/consumption-tracker/internal/models"
 )
 
-func GetElectricityCharts() (models.ElectricityCharts, error) {
-	electricities, err := GetElectricities()
+func (s *Storage) GetElectricityCharts() (models.ElectricityCharts, error) {
+	electricities, err := s.GetElectricities()
 	if err != nil {
 		return models.ElectricityCharts{}, err
 	}
@@ -145,8 +145,8 @@ func GetElectricityCharts() (models.ElectricityCharts, error) {
 	}, nil
 }
 
-func GetOilCharts() (models.OilCharts, error) {
-	oils, err := GetOil()
+func (s *Storage) GetOilCharts() (models.OilCharts, error) {
+	oils, err := s.GetOil()
 	if err != nil {
 		return models.OilCharts{}, err
 	}
@@ -192,7 +192,7 @@ func GetOilCharts() (models.OilCharts, error) {
 	}
 
 	// Fill levels
-	fillLevels, err := GetOilFillLevels()
+	fillLevels, err := s.GetOilFillLevels()
 	if err != nil {
 		return models.OilCharts{}, err
 	}
@@ -259,8 +259,8 @@ func GetOilCharts() (models.OilCharts, error) {
 	}, nil
 }
 
-func GetWaterCharts() (models.WaterCharts, error) {
-	waters, err := GetWater()
+func (s *Storage) GetWaterCharts() (models.WaterCharts, error) {
+	waters, err := s.GetWater()
 	if err != nil {
 		return models.WaterCharts{}, err
 	}
