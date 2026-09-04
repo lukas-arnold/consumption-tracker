@@ -93,10 +93,10 @@
 				<td>{{Float .Percentage 2}} %</td>
 				<td>
 					<article>
-						<form action="/oil-fill-level/edit/{{.Id}}">
+						<form action="/oil/fill-level/edit/{{.Id}}">
 							<button type="submit" class="secondary"><i class="fa-solid fa-pen"></i></button>
 						</form>
-						<form action="/oil-fill-level/delete/{{.Id}}">
+						<form action="/oil/fill-level/delete/{{.Id}}">
 							<button type="submit" class="contrast"><i class="fa-solid fa-trash"></i></button>
 						</form>
 					</article>
@@ -106,7 +106,7 @@
 		</tbody>
 	</table>
 </div>
-<form action="/oil-fill-level/add">
+<form action="/oil/fill-level/add">
 	<input type="submit" value='{{T "addOilFillLevel"}}'/>
 </form>
 <script>

@@ -1,6 +1,6 @@
 {{define "template"}}
 <h1 class="center">{{T "editOilFillLevel"}}</h1>
-<form action="/oil-fill-level/save/{{.Id}}" method="POST">
+<form action="/oil/fill-level/save/{{.Id}}" method="POST">
 	<input type="date" name="date" value="{{.Date}}" required>
 	<input type="number" step="0.1" name="level" value="{{.Level}}" placeholder='{{T "level"}}' required>
 	<input type="submit" value='{{T "save"}}'>
